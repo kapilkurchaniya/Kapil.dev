@@ -2,12 +2,14 @@
 
 import Image from "next/image";
 import {
+  ArrowDown,
   ArrowUpRight,
   Bot,
   BrainCircuit,
   BriefcaseBusiness,
   Code2,
   Database,
+  Download,
   Github,
   GraduationCap,
   Linkedin,
@@ -17,6 +19,7 @@ import {
   Menu,
   Moon,
   Rocket,
+  Send,
   Server,
   Sparkles,
   Sun,
@@ -26,8 +29,13 @@ import {
   Zap
 } from "lucide-react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import Lenis from "@studio-freight/lenis";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Magnetic, Reveal, TiltCard } from "./components/MotionPrimitives";
+import { SmoothScrollProvider, useSmoothScroll } from "./components/SmoothScroll";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const navItems = ["Projects", "Live", "Stack", "Experience", "Stats", "Contact"];
 
@@ -79,11 +87,18 @@ const projects = [
 ];
 
 const skills = [
-  { icon: Code2, label: "Frontend Systems", items: ["React.js", "TypeScript", "Tailwind CSS", "Component Architecture"] },
-  { icon: Server, label: "Backend APIs", items: ["Node.js", "Express.js", "REST APIs", "Socket.IO"] },
-  { icon: Database, label: "Data Layer", items: ["MongoDB", "CRUD Workflows", "Firebase", "Postman"] },
-  { icon: BrainCircuit, label: "AI + CS Core", items: ["AI Apps", "DSA", "OOP", "Complexity Analysis"] }
-];
+  ["React.js", "94", Code2],
+  ["TypeScript", "90", Terminal],
+  ["Node.js", "86", Server],
+  ["Express.js", "84", Server],
+  ["MongoDB", "82", Database],
+  ["Tailwind CSS", "95", Sparkles],
+  ["GSAP", "88", Zap],
+  ["Three.js", "82", BrainCircuit],
+  ["Framer Motion", "92", Rocket],
+  ["Firebase", "80", Database],
+  ["GitHub", "90", Github]
+] as const;
 
 const timeline = [
   {
@@ -111,7 +126,7 @@ const timeline = [
 
 const stats = [
   ["04", "Featured products"],
-  ["15+", "Core technologies"],
+  ["11", "Core technologies"],
   ["2028", "B.Tech graduation"],
   ["100%", "Builder mindset"]
 ];
@@ -120,24 +135,16 @@ function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
-  return <motion.div className="fixed left-0 top-0 z-50 h-1 origin-left bg-cyan-300" style={{ scaleX }} />;
+  return <motion.div className="fixed left-0 top-0 z-50 h-1 origin-left bg-cyan-300 shadow-glow" style={{ scaleX }} />;
 }
 
-function SectionHeading({
-  eyebrow,
-  title,
-  copy
-}: {
-  eyebrow: string;
-  title: string;
-  copy: string;
-}) {
+function SectionHeading({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
   return (
-    <div className="mx-auto mb-10 max-w-3xl text-center">
+    <Reveal className="mx-auto mb-12 max-w-3xl text-center">
       <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">{eyebrow}</p>
       <h2 className="text-balance text-3xl font-semibold text-white sm:text-5xl">{title}</h2>
       <p className="mt-4 text-base leading-7 text-slate-300">{copy}</p>
-    </div>
+    </Reveal>
   );
 }
 
@@ -145,70 +152,84 @@ function GlowButton({
   href,
   children,
   variant = "primary",
-  onClick
+  onClick,
+  download
 }: {
   href: string;
   children: React.ReactNode;
   variant?: "primary" | "secondary";
   onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
+  download?: boolean;
 }) {
   return (
-    <a
-      href={href}
-      onClick={onClick}
-      target={href.startsWith("#") ? undefined : "_blank"}
-      rel={href.startsWith("#") ? undefined : "noreferrer"}
-      className={`inline-flex min-h-11 items-center gap-2 rounded-md px-4 text-sm font-semibold transition ${
-        variant === "primary"
-          ? "bg-cyan-300 text-slate-950 shadow-glow hover:bg-cyan-200"
-          : "border border-white/15 bg-white/5 text-white hover:border-cyan-200/60 hover:bg-white/10"
-      }`}
-    >
-      {children}
-    </a>
+    <Magnetic className="inline-flex">
+      <a
+        href={href}
+        onClick={onClick}
+        target={href.startsWith("#") || href.startsWith("mailto:") ? undefined : "_blank"}
+        rel={href.startsWith("#") || href.startsWith("mailto:") ? undefined : "noreferrer"}
+        download={download}
+        className={`group relative inline-flex min-h-12 items-center gap-2 overflow-hidden rounded-md px-5 text-sm font-semibold transition ${
+          variant === "primary"
+            ? "bg-cyan-300 text-slate-950 shadow-glow hover:bg-cyan-200"
+            : "border border-white/15 bg-white/5 text-white hover:border-cyan-200/60 hover:bg-white/10"
+        }`}
+      >
+        <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/45 to-transparent transition duration-700 group-hover:translate-x-full" />
+        <span className="relative inline-flex items-center gap-2">{children}</span>
+      </a>
+    </Magnetic>
   );
 }
 
-function ProjectLinkPreview({ project }: { project: (typeof projects)[number] }) {
+function ProjectCard({ project, index }: { project: (typeof projects)[number]; index: number }) {
   return (
-    <motion.a
-      href={project.href}
-      target="_blank"
-      rel="noreferrer"
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-120px" }}
-      className="glass group block overflow-hidden rounded-lg transition hover:-translate-y-1 hover:border-cyan-200/40"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
-        <div>
-          <p className="text-sm font-semibold text-white">{project.name}</p>
-          <p className="text-xs text-slate-400">{project.type}</p>
-        </div>
-        <span className="inline-flex min-h-9 items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-slate-200 transition group-hover:border-cyan-200/50 group-hover:text-white">
-          Live link <ArrowUpRight size={14} />
-        </span>
-      </div>
-      <div className="relative aspect-[16/9] overflow-hidden bg-slate-950/70">
-        <Image
-          src={project.preview}
-          alt={`${project.name} project preview`}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover object-top transition duration-500 group-hover:scale-[1.03]"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent opacity-80" />
-        <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-100">Preview capture</p>
-            <h3 className="mt-1 text-2xl font-semibold text-white">{project.name}</h3>
+    <Reveal delay={index * 0.08}>
+      <TiltCard className="project-card group h-full min-h-[520px] w-[82vw] max-w-[430px] shrink-0 rounded-lg md:w-[430px]">
+        <a
+          href={project.href}
+          target="_blank"
+          rel="noreferrer"
+          className="glass relative flex h-full flex-col overflow-hidden rounded-lg p-4 transition hover:border-cyan-200/45"
+        >
+          <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
+            <div className={`h-full w-full bg-gradient-to-br ${project.accent} opacity-10`} />
           </div>
-          <span className="rounded-md bg-cyan-300 px-3 py-2 text-xs font-semibold text-slate-950 shadow-glow">
-            Open project
-          </span>
-        </div>
-      </div>
-    </motion.a>
+          <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-white/10 bg-slate-950/70">
+            <Image
+              src={project.preview}
+              alt={`${project.name} project preview`}
+              fill
+              sizes="(max-width: 768px) 82vw, 430px"
+              className="object-cover object-top transition duration-700 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/10 to-transparent" />
+            <span className="absolute left-4 top-4 rounded-md border border-cyan-200/25 bg-cyan-200/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+              {project.metric}
+            </span>
+          </div>
+          <div className="relative flex flex-1 flex-col p-2 pt-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-200">{project.type}</p>
+                <h3 className="mt-2 text-2xl font-semibold text-white">{project.name}</h3>
+              </div>
+              <span className="grid size-10 shrink-0 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-cyan-200 transition group-hover:-translate-y-1 group-hover:translate-x-1">
+                <ArrowUpRight size={18} />
+              </span>
+            </div>
+            <p className="mt-4 text-sm leading-6 text-slate-300">{project.summary}</p>
+            <div className="mt-auto flex flex-wrap gap-2 pt-6">
+              {project.stack.map((item) => (
+                <span key={item} className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-200">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        </a>
+      </TiltCard>
+    </Reveal>
   );
 }
 
@@ -224,9 +245,9 @@ function AIAssistant() {
   const [active, setActive] = useState(0);
 
   const replies = [
-    "KRISHI MITRA is the strongest AI-product signal: it combines agriculture context, soil/pH detection, responsive workflows, and marketing execution.",
-    "Kapil is an AI-focused full stack builder who ships React + Node products with a product story, UI discipline, and DSA fundamentals.",
-    "Frontend: TypeScript, React, Tailwind, reusable components. Backend: Node, Express, REST APIs, MongoDB, Socket.IO."
+    "KRISHI MITRA is the strongest AI-product signal: agriculture context, soil/pH detection, responsive workflows, and a clear product story.",
+    "Kapil is an AI-focused full stack builder who ships React + Node products with interface discipline and practical product instincts.",
+    "Frontend: TypeScript, React, Tailwind, Framer Motion, GSAP. Backend: Node, Express, REST APIs, MongoDB, Firebase."
   ];
 
   return (
@@ -270,99 +291,137 @@ function AIAssistant() {
   );
 }
 
-function HeroVisual() {
+function HeroShowcase() {
+  const [activeProject, setActiveProject] = useState(0);
+  const project = projects[activeProject];
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveProject((value) => (value + 1) % projects.length);
+    }, 3200);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, delay: 0.2 }}
-      className="relative"
-    >
-      <div className="absolute -inset-8 rounded-full bg-cyan-300/10 blur-3xl" />
+    <div className="hero-showcase relative min-h-[560px]">
+      <div className="absolute -inset-6 rounded-full bg-cyan-300/10 blur-3xl" />
+      <div className="absolute right-3 top-5 h-40 w-40 rounded-full border border-cyan-200/20 bg-cyan-200/5 blur-sm" />
+      <div className="absolute bottom-24 left-0 h-36 w-36 rounded-full border border-violet-200/20 bg-violet-300/5 blur-sm" />
+
       <div className="glass relative overflow-hidden rounded-lg p-4">
-        <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-4">
+        <div className="mb-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Image
               src="https://github.com/kapilkurchaniya.png"
               alt="Kapil Kurchaniya"
-              width={54}
-              height={54}
+              width={52}
+              height={52}
               className="rounded-md border border-white/15"
               priority
             />
             <div>
               <p className="font-semibold text-white">Kapil Kurchaniya</p>
-              <p className="text-xs text-slate-400">AI Engineer + Full Stack Product Builder</p>
+              <p className="text-xs text-slate-400">AI + Full Stack Product Builder</p>
             </div>
           </div>
-          <Terminal className="text-cyan-200" size={22} />
+          <span className="grid size-10 place-items-center rounded-md border border-cyan-200/20 bg-cyan-200/10 text-cyan-100">
+            <Sparkles size={18} />
+          </span>
         </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {stats.map(([value, label]) => (
-            <div key={label} className="rounded-md border border-white/10 bg-white/[0.04] p-3">
+
+        <div className="relative aspect-[16/11] overflow-hidden rounded-lg border border-white/10 bg-slate-950/65">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={project.name}
+              initial={{ opacity: 0, scale: 1.04, x: 28, filter: "blur(10px)" }}
+              animate={{ opacity: 1, scale: 1, x: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, scale: 0.98, x: -28, filter: "blur(8px)" }}
+              transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={project.preview}
+                alt={`${project.name} cinematic preview`}
+                fill
+                sizes="(max-width: 1024px) 100vw, 560px"
+                className="object-cover object-top"
+                priority={activeProject === 0}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
+            <span className="rounded-md border border-cyan-200/25 bg-cyan-200/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+              Live product signal
+            </span>
+            <span className="rounded-md border border-white/10 bg-white/[0.05] px-3 py-1 text-xs font-semibold text-slate-200">
+              0{activeProject + 1} / 04
+            </span>
+          </div>
+
+          <div className="absolute bottom-4 left-4 right-4">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${project.name}-copy`}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.45 }}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-100">{project.type}</p>
+                <h3 className="mt-1 text-2xl font-semibold text-white">{project.name}</h3>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {stats.map(([value, label], index) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.12 + index * 0.06 }}
+              className="rounded-md border border-white/10 bg-white/[0.04] p-3"
+            >
               <p className="text-2xl font-semibold text-white">{value}</p>
               <p className="mt-1 text-xs text-slate-400">{label}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
-        <div className="mt-4 grid gap-3 md:grid-cols-[1fr_0.85fr]">
-          <div className="rounded-lg border border-white/10 bg-slate-950/60 p-4">
-            <div className="mb-5 flex items-center justify-between">
-              <p className="text-sm font-semibold text-white">Product Signal</p>
-              <Sparkles className="text-violet-200" size={18} />
-            </div>
-            <div className="space-y-4">
-              {["AI App Thinking", "MERN Delivery", "Product Marketing"].map((label, index) => (
-                <div key={label}>
-                  <div className="mb-2 flex justify-between text-xs">
-                    <span className="text-slate-300">{label}</span>
-                    <span className="text-cyan-200">{92 - index * 7}%</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-white/10">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${92 - index * 7}%` }}
-                      transition={{ duration: 1, delay: 0.35 + index * 0.12 }}
-                      className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-violet-300"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <AIAssistant />
-        </div>
       </div>
-    </motion.div>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-[1fr_0.92fr]">
+        <div className="glass rounded-lg p-4">
+          <p className="text-sm font-semibold text-white">Project transitions</p>
+          <div className="mt-4 flex gap-2">
+            {projects.map((item, index) => (
+              <button
+                key={item.name}
+                onClick={() => setActiveProject(index)}
+                className={`h-2 flex-1 rounded-full transition ${
+                  index === activeProject ? "bg-cyan-300 shadow-glow" : "bg-white/15 hover:bg-white/30"
+                }`}
+                aria-label={`Show ${item.name}`}
+              />
+            ))}
+          </div>
+        </div>
+        <AIAssistant />
+      </div>
+    </div>
   );
 }
 
-export default function Home() {
+function HomeContent() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [booting, setBooting] = useState(true);
-  const lenisRef = useRef<Lenis | null>(null);
-
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      lerp: 0.08,
-      smoothWheel: true,
-      wheelMultiplier: 0.9
-    });
-    lenisRef.current = lenis;
-    let frame = 0;
-    const raf = (time: number) => {
-      lenis.raf(time);
-      frame = requestAnimationFrame(raf);
-    };
-    frame = requestAnimationFrame(raf);
-    return () => {
-      cancelAnimationFrame(frame);
-      lenis.destroy();
-      lenisRef.current = null;
-    };
-  }, []);
+  const scroll = useSmoothScroll();
+  const horizontalRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -374,12 +433,66 @@ export default function Home() {
     return () => window.clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      return;
+    }
+
+    const context = gsap.context(() => {
+      gsap.fromTo(
+        ".hero-showcase",
+        { scale: 0.86, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.95, ease: "power3.out", delay: 0.16 }
+      );
+
+      gsap.to(".ambient-grid", {
+        yPercent: 18,
+        opacity: 0.24,
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true
+        }
+      });
+
+      const media = gsap.matchMedia();
+      media.add("(min-width: 1024px)", () => {
+        const track = horizontalRef.current?.querySelector(".project-track");
+        if (!horizontalRef.current || !track) {
+          return undefined;
+        }
+
+        const distance = Math.max(0, track.scrollWidth - horizontalRef.current.offsetWidth + 64);
+        const tween = gsap.to(track, {
+          x: -distance,
+          ease: "none",
+          scrollTrigger: {
+            trigger: horizontalRef.current,
+            pin: true,
+            scrub: 0.45,
+            anticipatePin: 1,
+            start: "top top",
+            end: () => `+=${distance + 380}`,
+            invalidateOnRefresh: true
+          }
+        });
+
+        return () => tween.kill();
+      });
+    });
+
+    return () => context.revert();
+  }, []);
+
   const scrollToSection = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!href.startsWith("#")) {
       return;
     }
     event.preventDefault();
-    lenisRef.current?.scrollTo(href, { offset: -88 });
+    scroll?.scrollTo(href);
     window.history.pushState(null, "", href);
     setMenuOpen(false);
   };
@@ -399,17 +512,20 @@ export default function Home() {
                 <Loader2 className="animate-spin text-cyan-200" size={30} />
               </div>
               <p className="text-sm font-semibold uppercase tracking-[0.32em] text-cyan-100">Initializing portfolio</p>
-              <p className="mt-3 text-sm text-slate-300">Smooth scroll, live embeds, and theme engine are ready.</p>
+              <p className="mt-3 text-sm text-slate-300">Smooth scroll and cinematic transitions are ready.</p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
       <ScrollProgress />
-      <div className="grid-mask pointer-events-none absolute inset-x-0 top-0 h-[720px]" />
+      <div className="ambient-grid grid-mask pointer-events-none fixed inset-x-0 top-0 h-[760px]" />
+      <div className="noise-layer pointer-events-none fixed inset-0 z-0 opacity-[0.055]" />
+
       <header className="fixed left-0 right-0 top-4 z-40 px-4">
         <nav className="glass mx-auto flex max-w-6xl items-center justify-between rounded-lg px-3 py-3">
           <a href="#top" onClick={(event) => scrollToSection(event, "#top")} className="flex items-center gap-2 text-sm font-semibold text-white">
-            <span className="grid size-8 place-items-center rounded-md bg-cyan-300 text-slate-950">K</span>
+            <span className="grid size-8 place-items-center rounded-md bg-cyan-300 text-slate-950 shadow-glow">K</span>
             Kapil.dev
           </a>
           <div className="hidden items-center gap-1 md:flex">
@@ -448,12 +564,16 @@ export default function Home() {
               {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
             </button>
             <button className="grid size-9 place-items-center rounded-md border border-white/10 text-white" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle menu">
-            {menuOpen ? <X size={18} /> : <Menu size={18} />}
+              {menuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </nav>
         {menuOpen && (
-          <div className="glass mx-auto mt-2 grid max-w-6xl gap-1 rounded-lg p-2 md:hidden">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass mx-auto mt-2 grid max-w-6xl gap-1 rounded-lg p-2 md:hidden"
+          >
             {navItems.map((item) => (
               <a
                 key={item}
@@ -464,22 +584,62 @@ export default function Home() {
                 {item}
               </a>
             ))}
-          </div>
+          </motion.div>
         )}
       </header>
 
-      <section id="top" className="relative mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-4 pb-16 pt-28 lg:grid-cols-[0.88fr_1.12fr]">
-        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65 }}>
-          <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-cyan-200/20 bg-cyan-200/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100">
+      <section
+        ref={heroRef}
+        id="top"
+        className="relative z-10 mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-4 pb-16 pt-28 lg:grid-cols-[0.9fr_1.1fr]"
+      >
+        <div>
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65 }}
+            className="mb-5 inline-flex items-center gap-2 rounded-md border border-cyan-200/20 bg-cyan-200/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100"
+          >
             <Zap size={14} />
             Bhopal-based builder
+          </motion.div>
+          <div className="overflow-hidden">
+            <motion.h1
+              initial={{ y: 120 }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              className="text-balance text-5xl font-semibold leading-[1.02] text-white sm:text-6xl lg:text-7xl"
+            >
+              Kapil Kurchaniya
+            </motion.h1>
           </div>
-          <h1 className="text-balance text-5xl font-semibold leading-[1.02] text-white sm:text-6xl lg:text-7xl">
-            AI Engineer + Full Stack Product Builder
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-            I build MERN products with sharp interfaces, practical APIs, and startup-style product storytelling across agriculture, education, restaurant, and NGO platforms.
-          </p>
+          <motion.div
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: {},
+              show: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } }
+            }}
+            className="mt-4 flex flex-wrap gap-2"
+          >
+            {["Full Stack Developer", "Creative Frontend Engineer", "AI Builder"].map((label) => (
+              <motion.span
+                key={label}
+                variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
+                className="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-semibold text-slate-200"
+              >
+                {label}
+              </motion.span>
+            ))}
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.32 }}
+            className="mt-6 max-w-2xl text-lg leading-8 text-slate-300"
+          >
+            Building immersive digital experiences with AI, 3D, and modern frontend engineering.
+          </motion.p>
           <div className="mt-8 flex flex-wrap gap-3">
             <GlowButton href="#projects" onClick={(event) => scrollToSection(event, "#projects")}>
               Explore work <ArrowUpRight size={17} />
@@ -496,123 +656,128 @@ export default function Home() {
               <Rocket size={16} className="text-violet-200" /> MERN + AI apps
             </span>
           </div>
-        </motion.div>
-        <HeroVisual />
+        </div>
+
+        <HeroShowcase />
+
+        <a
+          href="#projects"
+          onClick={(event) => scrollToSection(event, "#projects")}
+          className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100 md:flex"
+        >
+          Scroll <ArrowDown className="animate-bounce" size={16} />
+        </a>
       </section>
 
-      <section id="projects" className="relative px-4 py-20">
+      <section ref={horizontalRef} id="projects" className="relative z-10 px-4 py-20 md:min-h-screen">
         <div className="mx-auto max-w-6xl">
           <SectionHeading
             eyebrow="Featured projects"
-            title="Built like product case studies, not assignment cards."
-            copy="Each project is framed around the user problem, system choices, and proof that Kapil can ship usable software with a clear story."
+            title="Cinematic product cards built for depth and motion."
+            copy="Each project is framed around user value, visual proof, and the stack decisions behind the shipped experience."
           />
-          <div className="grid gap-4 md:grid-cols-2">
-            {projects.map((project, index) => (
-              <motion.a
-                key={project.name}
-                href={project.href}
-                target="_blank"
-                rel="noreferrer"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ delay: index * 0.06 }}
-                className="glass group rounded-lg p-5 transition hover:-translate-y-1 hover:border-cyan-200/35"
-              >
-                <div className={`mb-5 h-32 rounded-lg bg-gradient-to-br ${project.accent} p-px`}>
-                  <div className="flex h-full flex-col justify-between rounded-lg bg-slate-950/85 p-4">
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">{project.type}</p>
-                      <ArrowUpRight className="text-cyan-200 transition group-hover:translate-x-1 group-hover:-translate-y-1" size={19} />
-                    </div>
-                    <p className="text-xl font-semibold text-white">{project.metric}</p>
-                  </div>
-                </div>
-                <h3 className="text-2xl font-semibold text-white">{project.name}</h3>
-                <p className="mt-3 min-h-24 text-sm leading-6 text-slate-300">{project.summary}</p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {project.stack.map((item) => (
-                    <span key={item} className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-200">
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </motion.a>
-            ))}
-          </div>
+        </div>
+        <div className="project-track mx-auto flex max-w-6xl gap-5 overflow-x-auto pb-6 md:w-max md:overflow-visible">
+          {projects.map((project, index) => (
+            <ProjectCard key={project.name} project={project} index={index} />
+          ))}
         </div>
       </section>
 
-      <section id="live" className="relative px-4 py-20">
+      <section id="live" className="relative z-10 px-4 py-20">
         <div className="mx-auto max-w-6xl">
           <SectionHeading
             eyebrow="Live links"
-            title="Fast project previews without heavy embeds."
-            copy="Each card uses a captured preview image and opens the real project in a new tab, keeping the portfolio smooth while still showing the live work."
-          /> 
+            title="Preview the work without slowing the show."
+            copy="Captured previews keep scrolling smooth while every card still opens the real deployed project."
+          />
           <div className="grid gap-5 md:grid-cols-2">
-            {projects.map((project) => (
-              <ProjectLinkPreview key={project.name} project={project} />
+            {projects.map((project, index) => (
+              <Reveal key={project.name} delay={index * 0.06}>
+                <a href={project.href} target="_blank" rel="noreferrer" className="glass group block overflow-hidden rounded-lg transition hover:-translate-y-1 hover:border-cyan-200/40">
+                  <div className="relative aspect-[16/9] overflow-hidden bg-slate-950/70">
+                    <Image src={project.preview} alt={`${project.name} live preview`} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover object-top transition duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-100">{project.type}</p>
+                        <h3 className="mt-1 text-2xl font-semibold text-white">{project.name}</h3>
+                      </div>
+                      <span className="grid size-11 place-items-center rounded-md bg-cyan-300 text-slate-950 shadow-glow">
+                        <ArrowUpRight size={18} />
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="stack" className="px-4 py-20">
+      <section id="stack" className="relative z-10 px-4 py-20">
         <div className="mx-auto max-w-6xl">
           <SectionHeading
             eyebrow="Tech stack"
-            title="A practical stack for fast product iteration."
-            copy="The portfolio emphasizes the tools Kapil already uses to move from interface to API to shipped deployment."
+            title="Floating tools for modern product engineering."
+            copy="A motion-first skill grid that highlights frontend craft, backend delivery, data flow, animation, and 3D interaction."
           />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {skills.map(({ icon: Icon, label, items }) => (
-              <div key={label} className="glass rounded-lg p-5">
-                <span className="mb-5 grid size-11 place-items-center rounded-md bg-white/10 text-cyan-200">
-                  <Icon size={21} />
-                </span>
-                <h3 className="text-lg font-semibold text-white">{label}</h3>
-                <div className="mt-4 space-y-2">
-                  {items.map((item) => (
-                    <p key={item} className="rounded-md border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-slate-300">
-                      {item}
-                    </p>
-                  ))}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {skills.map(([label, level, Icon], index) => (
+              <Reveal key={label} delay={index * 0.035}>
+                <div className="glass group rounded-lg p-5 transition hover:-translate-y-1 hover:border-cyan-200/35">
+                  <div className="mb-5 flex items-center justify-between">
+                    <span className="grid size-11 place-items-center rounded-md bg-white/10 text-cyan-200 transition group-hover:bg-cyan-300 group-hover:text-slate-950">
+                      <Icon size={21} />
+                    </span>
+                    <span className="text-sm font-semibold text-cyan-100">{level}%</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-white">{label}</h3>
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${level}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1, delay: 0.12 }}
+                      className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-violet-300 to-fuchsia-300"
+                    />
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="experience" className="px-4 py-20">
+      <section id="experience" className="relative z-10 px-4 py-20">
         <div className="mx-auto max-w-5xl">
           <SectionHeading
             eyebrow="Experience"
             title="Internship, education, and leadership in one timeline."
-            copy="This keeps the student background, professional practice, and campus leadership connected to a product-engineering narrative."
+            copy="The story connects student growth, production practice, and community leadership into a product-engineering path."
           />
           <div className="space-y-4">
-            {timeline.map(({ title, org, detail, icon: Icon }) => (
-              <div key={title} className="glass grid gap-4 rounded-lg p-5 md:grid-cols-[auto_1fr]">
-                <span className="grid size-12 place-items-center rounded-md bg-cyan-300/15 text-cyan-200">
-                  <Icon size={22} />
-                </span>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">{title}</h3>
-                  <p className="mt-1 text-sm font-medium text-violet-200">{org}</p>
-                  <p className="mt-3 text-sm leading-6 text-slate-300">{detail}</p>
+            {timeline.map(({ title, org, detail, icon: Icon }, index) => (
+              <Reveal key={title} delay={index * 0.08}>
+                <div className="glass grid gap-4 rounded-lg p-5 md:grid-cols-[auto_1fr]">
+                  <span className="grid size-12 place-items-center rounded-md bg-cyan-300/15 text-cyan-200">
+                    <Icon size={22} />
+                  </span>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white">{title}</h3>
+                    <p className="mt-1 text-sm font-medium text-violet-200">{org}</p>
+                    <p className="mt-3 text-sm leading-6 text-slate-300">{detail}</p>
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="stats" className="px-4 py-20">
+      <section id="stats" className="relative z-10 px-4 py-20">
         <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[0.85fr_1.15fr]">
-          <div>
+          <Reveal>
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">GitHub + LeetCode</p>
             <h2 className="text-balance text-3xl font-semibold text-white sm:text-5xl">Signals for consistency, curiosity, and problem solving.</h2>
             <p className="mt-4 text-base leading-7 text-slate-300">
@@ -626,42 +791,89 @@ export default function Home() {
                 LinkedIn <Linkedin size={17} />
               </GlowButton>
             </div>
-          </div>
-          <div className="glass rounded-lg p-5">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                ["Stacks + queues", "Core DSA"],
-                ["BST + OOP", "Problem models"],
-                ["Time complexity", "Optimization"],
-                ["Space complexity", "Competitive programming"]
-              ].map(([title, label]) => (
-                <div key={title} className="rounded-md border border-white/10 bg-white/[0.04] p-4">
-                  <p className="text-lg font-semibold text-white">{title}</p>
-                  <p className="mt-2 text-sm text-slate-400">{label}</p>
-                </div>
-              ))}
+          </Reveal>
+          <Reveal delay={0.12}>
+            <div className="glass rounded-lg p-5">
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  ["Stacks + queues", "Core DSA"],
+                  ["BST + OOP", "Problem models"],
+                  ["Time complexity", "Optimization"],
+                  ["Space complexity", "Competitive programming"]
+                ].map(([title, label]) => (
+                  <div key={title} className="rounded-md border border-white/10 bg-white/[0.04] p-4">
+                    <p className="text-lg font-semibold text-white">{title}</p>
+                    <p className="mt-2 text-sm text-slate-400">{label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      <section id="contact" className="px-4 pb-24 pt-16">
-        <div className="glass mx-auto max-w-5xl rounded-lg p-6 text-center sm:p-10">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">Contact</p>
-          <h2 className="text-balance text-3xl font-semibold text-white sm:text-5xl">Let’s build the next AI-powered product.</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-300">
-            Available for internships, startup-style product work, MERN development, AI-integrated web apps, and technical multimedia production.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <GlowButton href="mailto:kapilkurchaniya98@gmail.com">
-              Email Kapil <Mail size={17} />
-            </GlowButton>
-            <GlowButton href="https://github.com/kapilkurchaniya" variant="secondary">
-              View GitHub <Github size={17} />
-            </GlowButton>
+      <section id="contact" className="relative z-10 px-4 pb-24 pt-16">
+        <Reveal>
+          <div className="glass mx-auto grid max-w-5xl gap-8 rounded-lg p-6 sm:p-10 lg:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">Contact</p>
+              <h2 className="text-balance text-3xl font-semibold text-white sm:text-5xl">Let&apos;s build the next AI-powered product.</h2>
+              <p className="mt-4 text-base leading-7 text-slate-300">
+                Available for internships, startup-style product work, MERN development, AI-integrated web apps, and technical multimedia production.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <GlowButton href="mailto:kapilkurchaniya98@gmail.com">
+                  Email <Mail size={17} />
+                </GlowButton>
+                <GlowButton href="https://github.com/kapilkurchaniya" variant="secondary">
+                  GitHub <Github size={17} />
+                </GlowButton>
+                <GlowButton href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" variant="secondary">
+                  LinkedIn <Linkedin size={17} />
+                </GlowButton>
+                <GlowButton href="/Kapil-Kurchaniya-Resume.pdf" variant="secondary" download>
+                  Resume <Download size={17} />
+                </GlowButton>
+              </div>
+            </div>
+            <form className="space-y-4" action="mailto:kapilkurchaniya98@gmail.com" method="post" encType="text/plain">
+              {[
+                ["name", "Your name"],
+                ["email", "Email address"],
+                ["message", "Project idea"]
+              ].map(([name, placeholder]) =>
+                name === "message" ? (
+                  <textarea
+                    key={name}
+                    name={name}
+                    placeholder={placeholder}
+                    rows={5}
+                    className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-200/60 focus:bg-cyan-200/5"
+                  />
+                ) : (
+                  <input
+                    key={name}
+                    name={name}
+                    placeholder={placeholder}
+                    className="h-12 w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-200/60 focus:bg-cyan-200/5"
+                  />
+                )
+              )}
+              <button className="inline-flex min-h-12 items-center gap-2 rounded-md bg-cyan-300 px-5 text-sm font-semibold text-slate-950 shadow-glow transition hover:bg-cyan-200">
+                Send signal <Send size={17} />
+              </button>
+            </form>
           </div>
-        </div>
+        </Reveal>
       </section>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <SmoothScrollProvider>
+      <HomeContent />
+    </SmoothScrollProvider>
   );
 }
