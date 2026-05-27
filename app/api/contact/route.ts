@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
+export const runtime = "nodejs";
+
 type ContactPayload = {
   name?: string;
   email?: string;
   message?: string;
 };
-
-const recipient = "kapilkurchaniya98@gmail.com";
 
 export async function POST(request: Request) {
   try {
@@ -26,8 +26,9 @@ export async function POST(request: Request) {
 
     const user = process.env.GOOGLE_USER_EMAIL;
     const pass = process.env.GOOGLE_APP_PASSWORD;
+    const recipient = process.env.CONTACT_TO_EMAIL || "kapilkurchaniya98@gmail.com";
 
-    if (!user || !pass) {
+    if (!user || !pass || !recipient) {
       return NextResponse.json({ error: "Email service is not configured." }, { status: 500 });
     }
 
@@ -57,7 +58,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Contact email failed:", error);
-    return NextResponse.json({ error: "Could not send message right now." }, { status: 500 });
+    const isDevelopment = process.env.NODE_ENV !== "production";
+    const details = error instanceof Error ? error.message : "Unknown email error";
+
+    return NextResponse.json(
+      {
+        error: "Could not send message right now.",
+        ...(isDevelopment ? { details } : {})
+      },
+      { status: 500 }
+    );
   }
 }
 
