@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+
+// @ts-ignore: CSS import side effects are handled by Next.js
 import "./globals.css";
 
 const inter = Inter({

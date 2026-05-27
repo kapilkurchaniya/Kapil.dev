@@ -74,6 +74,7 @@ h3 {
   border: 1px solid var(--glass-border);
   background: var(--glass-bg);
   box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   position: relative;
 }
@@ -102,6 +103,7 @@ h3 {
     linear-gradient(var(--grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 56px 56px;
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent 78%);
   mask-image: linear-gradient(to bottom, black, transparent 78%);
 }
 
@@ -136,6 +138,7 @@ h3 {
 
 @media (max-width: 1023px) {
   .glass {
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
 }

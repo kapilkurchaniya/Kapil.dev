@@ -419,6 +419,8 @@ function HomeContent() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [booting, setBooting] = useState(true);
+  const [contactStatus, setContactStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [contactMessage, setContactMessage] = useState("");
   const scroll = useSmoothScroll();
   const horizontalRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
@@ -495,6 +497,42 @@ function HomeContent() {
     scroll?.scrollTo(href);
     window.history.pushState(null, "", href);
     setMenuOpen(false);
+  };
+
+  const handleContactSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    setContactStatus("sending");
+    setContactMessage("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: formData.get("name"),
+          email: formData.get("email"),
+          message: formData.get("message")
+        })
+      });
+
+      const result = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error || "Could not send message.");
+      }
+
+      form.reset();
+      setContactStatus("sent");
+      setContactMessage("Message sent. I will reply soon.");
+    } catch (error) {
+      setContactStatus("error");
+      setContactMessage(error instanceof Error ? error.message : "Could not send message.");
+    }
   };
 
   return (
@@ -836,7 +874,7 @@ function HomeContent() {
                 </GlowButton>
               </div>
             </div>
-            <form className="space-y-4" action="mailto:kapilkurchaniya98@gmail.com" method="post" encType="text/plain">
+            <form className="space-y-4" onSubmit={handleContactSubmit}>
               {[
                 ["name", "Your name"],
                 ["email", "Email address"],
@@ -859,9 +897,17 @@ function HomeContent() {
                   />
                 )
               )}
-              <button className="inline-flex min-h-12 items-center gap-2 rounded-md bg-cyan-300 px-5 text-sm font-semibold text-slate-950 shadow-glow transition hover:bg-cyan-200">
-                Send signal <Send size={17} />
+              <button
+                disabled={contactStatus === "sending"}
+                className="inline-flex min-h-12 items-center gap-2 rounded-md bg-cyan-300 px-5 text-sm font-semibold text-slate-950 shadow-glow transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {contactStatus === "sending" ? "Sending..." : "Send signal"} <Send size={17} />
               </button>
+              {contactMessage && (
+                <p className={`text-sm ${contactStatus === "sent" ? "text-emerald-200" : "text-rose-200"}`}>
+                  {contactMessage}
+                </p>
+              )}
             </form>
           </div>
         </Reveal>
