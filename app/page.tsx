@@ -432,10 +432,10 @@ export default function Home() {
             >
               {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
             </button>
-            <a href="https://github.com/kapilkurchaniya" target="_blank" rel="noreferrer" className="grid size-9 place-items-center rounded-md border border-white/10 text-slate-300 hover:text-white" aria-label="GitHub">
+            <a href="https://github.com/kapilkurchaniya" target="_blank" rel="noopener noreferrer" className="grid size-9 place-items-center rounded-md border border-white/10 text-slate-300 hover:text-white" aria-label="GitHub">
               <Github size={17} />
             </a>
-            <a href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" target="_blank" rel="noreferrer" className="grid size-9 place-items-center rounded-md border border-white/10 text-slate-300 hover:text-white" aria-label="LinkedIn">
+            <a href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" target="_blank" rel="noopener noreferrer" className="grid size-9 place-items-center rounded-md border border-white/10 text-slate-300 hover:text-white" aria-label="LinkedIn">
               <Linkedin size={17} />
             </a>
           </div>
@@ -550,7 +550,7 @@ export default function Home() {
             eyebrow="Live links"
             title="Fast project previews without heavy embeds."
             copy="Each card uses a captured preview image and opens the real project in a new tab, keeping the portfolio smooth while still showing the live work."
-          />
+          /> 
           <div className="grid gap-5 md:grid-cols-2">
             {projects.map((project) => (
               <ProjectLinkPreview key={project.name} project={project} />
