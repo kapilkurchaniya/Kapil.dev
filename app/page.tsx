@@ -39,14 +39,50 @@ gsap.registerPlugin(ScrollTrigger);
 
 const navItems = ["Projects", "Live", "Stack", "Experience", "Stats", "Contact"];
 
-const projects = [
+type Project = {
+  name: string;
+  type: string;
+  summary: string;
+  stack: string[];
+  href?: string;
+  github?: string;
+  preview: string;
+  accent: string;
+  metric: string;
+};
+
+const projects: Project[] = [
+  {
+    name: "MEDIASSIST AI",
+    type: "AI Healthcare Platform",
+    summary:
+      "Prescription digitizer and medicine safety checker powered by Google Gemini AI, built for fast extraction and safer medication review.",
+    stack: ["TypeScript", "React", "Gemini AI", "Tailwind"],
+    href: "https://mediassist-ai-services.vercel.app/",
+    github: "https://github.com/kapilkurchaniya/MediAssist_AI",
+    preview: "/previews/mediassist-ai.png",
+    accent: "from-cyan-300 via-emerald-300 to-blue-300",
+    metric: "AI healthtech"
+  },
+  {
+    name: "FRIDAY THE ASSISTANT",
+    type: "Modular AI Assistant",
+    summary:
+      "Python-first AI assistant with an LLM intent router, Groq chat fallbacks, real-time web search, system automation, voice I/O, Flask UI, and PyQt5 desktop mode.",
+    stack: ["Python", "Flask", "Groq", "Tavily", "Tailwind"],
+    github: "https://github.com/kapilkurchaniya/FRIDAY_THE_ASSITANT",
+    preview: "/previews/friday-assistant.png",
+    accent: "from-cyan-300 via-teal-300 to-slate-200",
+    metric: "Repo showcase"
+  },
   {
     name: "KRISHI MITRA",
     type: "AI Agriculture Platform",
     summary:
       "Soil health and pH detection platform with responsive dashboards, AI-centered user flows, and cinematic product storytelling.",
     stack: ["TypeScript", "React", "Node", "Express", "Tailwind"],
-    href: "https://krishi-mitra-ai-powered-app.vercel.app/",
+    href: "https://krihi-mitra.vercel.app/",
+    github: "https://github.com/kapilkurchaniya/KRISHI-MITRA-",
     preview: "/previews/krishi-mitra.png",
     accent: "from-emerald-300 via-cyan-300 to-violet-300",
     metric: "AI-first agritech"
@@ -57,7 +93,8 @@ const projects = [
     summary:
       "Interactive restaurant application with dynamic menus, accessible UI states, and a polished showcase for food discovery.",
     stack: ["TypeScript", "React", "HTML5", "CSS3"],
-    href: "https://karishma-kitchen-app.vercel.app/",
+    href: "https://karishma-healthy-kitchen.vercel.app/",
+    github: "https://github.com/kapilkurchaniya/Karishma-s-kitchen",
     preview: "/previews/karishma-kitchen.png",
     accent: "from-rose-300 via-orange-200 to-cyan-200",
     metric: "Responsive commerce"
@@ -69,6 +106,7 @@ const projects = [
       "Fast-loading school portal with structured navigation, clean information hierarchy, and mobile-ready student journeys.",
     stack: ["TypeScript", "React", "Tailwind"],
     href: "https://tagore-vidya-niketan.vercel.app/",
+    github: "https://github.com/kapilkurchaniya/TOGORE-VIDYA-NIKETAN",
     preview: "/previews/tagore-vidya-niketan.png",
     accent: "from-sky-300 via-indigo-300 to-fuchsia-300",
     metric: "Learning portal"
@@ -80,9 +118,22 @@ const projects = [
       "Digital foundation platform with activity sections, clear content architecture, and community-focused frontend delivery.",
     stack: ["TypeScript", "React", "JavaScript"],
     href: "https://redlifeline.vercel.app/",
+    github: "https://github.com/kapilkurchaniya/Redlifelline-hub-foundation",
     preview: "/previews/redlifeline.png",
     accent: "from-red-300 via-pink-300 to-teal-200",
     metric: "Impact platform"
+  }
+];
+
+const liveProjects = projects.filter((project): project is Project & { href: string } => Boolean(project.href));
+
+const moreProjects = [
+  {
+    name: "Spotlight Effect 2",
+    summary: "A visually stunning spotlight effect highlighting elements with fluid motion and interaction.",
+    stack: ["React", "TypeScript", "Tailwind CSS"],
+    href: "https://spotlight-effect2.vercel.app/",
+    github: "https://github.com/kapilkurchaniya/Spotlight-Effect2",
   }
 ];
 
@@ -125,13 +176,37 @@ const timeline = [
 ];
 
 const stats = [
-  ["04", "Featured products"],
+  ["06", "Featured products"],
   ["11", "Core technologies"],
   ["2028", "B.Tech graduation"],
   ["100%", "Builder mindset"]
 ];
 
 const smoothEase = [0.22, 1, 0.36, 1] as const;
+
+function PortfolioPreloader({ onComplete }: { onComplete: () => void }) {
+  useEffect(() => {
+    const timer = window.setTimeout(onComplete, 850);
+    return () => window.clearTimeout(timer);
+  }, [onComplete]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="fixed inset-0 z-[80] grid place-items-center bg-[var(--loader-bg)] backdrop-blur-2xl"
+    >
+      <div className="text-center">
+        <div className="mx-auto mb-5 grid size-16 place-items-center rounded-lg border border-cyan-200/25 bg-cyan-200/10 shadow-glow">
+          <Loader2 className="animate-spin text-cyan-200" size={30} />
+        </div>
+        <p className="text-sm font-semibold uppercase tracking-[0.32em] text-cyan-100">Initializing portfolio</p>
+        <p className="mt-3 text-sm text-slate-300">Smooth scroll and cinematic transitions are ready.</p>
+      </div>
+    </motion.div>
+  );
+}
 
 function AnimatedStatValue({ value }: { value: string }) {
   const isPercent = value.endsWith("%");
@@ -200,14 +275,11 @@ function GlowButton({
   );
 }
 
-function ProjectCard({ project, index }: { project: (typeof projects)[number]; index: number }) {
+function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
     <Reveal delay={index * 0.08}>
       <TiltCard className="project-card group h-full min-h-[520px] w-[82vw] max-w-[430px] shrink-0 rounded-lg md:w-[430px]">
-        <motion.a
-          href={project.href}
-          target="_blank"
-          rel="noreferrer"
+        <motion.div
           whileTap={{ scale: 0.985 }}
           className="glass relative flex h-full flex-col overflow-hidden rounded-lg p-4 transition hover:border-cyan-200/45"
         >
@@ -232,7 +304,7 @@ function ProjectCard({ project, index }: { project: (typeof projects)[number]; i
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.18 + index * 0.04 }}
-              className="absolute left-4 top-4 rounded-md border border-cyan-200/25 bg-cyan-200/10 px-3 py-1 text-xs font-semibold text-cyan-100"
+              className="absolute left-4 top-4 z-10 rounded-md border border-cyan-200/45 bg-slate-950/85 px-3 py-1 text-xs font-semibold text-cyan-100 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-md"
             >
               {project.metric}
             </motion.span>
@@ -243,12 +315,32 @@ function ProjectCard({ project, index }: { project: (typeof projects)[number]; i
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-200">{project.type}</p>
                 <h3 className="mt-2 text-2xl font-semibold text-white">{project.name}</h3>
               </div>
-              <motion.span
-                whileHover={{ rotate: 12 }}
-                className="grid size-10 shrink-0 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-cyan-200 transition group-hover:-translate-y-1 group-hover:translate-x-1"
-              >
-                <ArrowUpRight size={18} />
-              </motion.span>
+              <div className="flex shrink-0 gap-2">
+                {project.github && (
+                  <motion.a
+                    href={project.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`${project.name} GitHub repository`}
+                    whileHover={{ y: -3 }}
+                    className="grid size-10 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-slate-300 transition hover:border-white/25 hover:text-white"
+                  >
+                    <Github size={18} />
+                  </motion.a>
+                )}
+                {project.href && (
+                  <motion.a
+                    href={project.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`Open ${project.name}`}
+                    whileHover={{ rotate: 12 }}
+                    className="grid size-10 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-cyan-200 transition group-hover:-translate-y-1 group-hover:translate-x-1"
+                  >
+                    <ArrowUpRight size={18} />
+                  </motion.a>
+                )}
+              </div>
             </div>
             <p className="mt-4 text-sm leading-6 text-slate-300">{project.summary}</p>
             <StaggerReveal className="mt-auto flex flex-wrap gap-2 pt-6" delay={0.1} stagger={0.045}>
@@ -261,7 +353,7 @@ function ProjectCard({ project, index }: { project: (typeof projects)[number]; i
               ))}
             </StaggerReveal>
           </div>
-        </motion.a>
+        </motion.div>
       </TiltCard>
     </Reveal>
   );
@@ -279,7 +371,7 @@ function AIAssistant() {
   const [active, setActive] = useState(0);
 
   const replies = [
-    "KRISHI MITRA is the strongest AI-product signal: agriculture context, soil/pH detection, responsive workflows, and a clear product story.",
+    "MEDIASSIST AI, FRIDAY THE ASSISTANT, and KRISHI MITRA are the strongest AI-product signals: healthcare safety workflows, voice assistant routing, agriculture context, responsive flows, and clear product stories.",
     "Kapil is an AI-focused full stack builder who ships React + Node products with interface discipline and practical product instincts.",
     "Frontend: TypeScript, React, Tailwind, Framer Motion, GSAP. Backend: Node, Express, REST APIs, MongoDB, Firebase."
   ];
@@ -497,9 +589,12 @@ function HomeContent() {
   }, [theme]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setBooting(false), 850);
-    return () => window.clearTimeout(timer);
-  }, []);
+    document.body.style.overflow = booting ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [booting]);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -528,27 +623,32 @@ function HomeContent() {
 
       const media = gsap.matchMedia();
       media.add("(min-width: 1024px)", () => {
-        const track = horizontalRef.current?.querySelector(".project-track");
-        if (!horizontalRef.current || !track) {
+        const section = horizontalRef.current;
+        const track = section?.querySelector<HTMLElement>(".project-track");
+        if (!section || !track) {
           return undefined;
         }
 
-        const distance = Math.max(0, track.scrollWidth - horizontalRef.current.offsetWidth + 64);
+        const getDistance = () => Math.max(0, track.scrollWidth - section.offsetWidth + 96);
         const tween = gsap.to(track, {
-          x: -distance,
+          x: () => -getDistance(),
           ease: "none",
           scrollTrigger: {
-            trigger: horizontalRef.current,
+            trigger: section,
             pin: true,
             scrub: 0.45,
             anticipatePin: 1,
             start: "top top",
-            end: () => `+=${distance + 380}`,
+            end: () => `+=${getDistance() + 420}`,
             invalidateOnRefresh: true
           }
         });
+        const refresh = window.setTimeout(() => ScrollTrigger.refresh(), 250);
 
-        return () => tween.kill();
+        return () => {
+          window.clearTimeout(refresh);
+          tween.kill();
+        };
       });
     });
 
@@ -605,20 +705,7 @@ function HomeContent() {
     <main className="relative min-h-screen overflow-hidden">
       <AnimatePresence>
         {booting && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="fixed inset-0 z-[80] grid place-items-center bg-[var(--loader-bg)] backdrop-blur-2xl"
-          >
-            <div className="text-center">
-              <div className="mx-auto mb-5 grid size-16 place-items-center rounded-lg border border-cyan-200/25 bg-cyan-200/10 shadow-glow">
-                <Loader2 className="animate-spin text-cyan-200" size={30} />
-              </div>
-              <p className="text-sm font-semibold uppercase tracking-[0.32em] text-cyan-100">Initializing portfolio</p>
-              <p className="mt-3 text-sm text-slate-300">Smooth scroll and cinematic transitions are ready.</p>
-            </div>
-          </motion.div>
+          <PortfolioPreloader onComplete={() => setBooting(false)} />
         )}
       </AnimatePresence>
 
@@ -808,10 +895,51 @@ function HomeContent() {
             copy="Each project is framed around user value, visual proof, and the stack decisions behind the shipped experience."
           />
         </div>
-        <div className="project-track mx-auto flex max-w-6xl gap-5 overflow-x-auto pb-6 md:w-max md:overflow-visible">
+        <div className="project-track mx-auto flex max-w-full gap-5 overflow-x-auto pb-6 md:w-max md:max-w-none md:overflow-visible">
           {projects.map((project, index) => (
             <ProjectCard key={project.name} project={project} index={index} />
           ))}
+        </div>
+        <div className="mx-auto mt-32 max-w-6xl">
+          <Reveal>
+            <p className="mb-6 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">More Projects</p>
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {moreProjects.map((project) => (
+                <motion.div
+                  key={project.name}
+                  whileHover={{ y: -6, borderColor: "rgba(103, 232, 249, 0.4)" }}
+                  className="glass flex flex-col justify-between rounded-lg p-6 transition border border-white/5"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="grid size-10 place-items-center rounded-md bg-cyan-300/10 text-cyan-200">
+                        <Code2 size={18} />
+                      </span>
+                      <div className="flex gap-2">
+                        {project.github && (
+                          <a href={project.github} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition">
+                            <Github size={18} />
+                          </a>
+                        )}
+                        <a href={project.href} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-cyan-200 transition">
+                          <ArrowUpRight size={18} />
+                        </a>
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-semibold text-white">{project.name}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">{project.summary}</p>
+                  </div>
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {project.stack.map((item) => (
+                      <span key={item} className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-slate-300">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -823,7 +951,7 @@ function HomeContent() {
             copy="Captured previews keep scrolling smooth while every card still opens the real deployed project."
           />
           <StaggerReveal className="grid gap-5 md:grid-cols-2" stagger={0.08}>
-            {projects.map((project) => (
+            {liveProjects.map((project) => (
               <StaggerItem key={project.name}>
                 <motion.a
                   href={project.href}
