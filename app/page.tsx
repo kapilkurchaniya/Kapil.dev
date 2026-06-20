@@ -32,7 +32,7 @@ import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion"
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Magnetic, Reveal, TiltCard } from "./components/MotionPrimitives";
+import { AnimatedNumber, Magnetic, Reveal, StaggerItem, StaggerReveal, TiltCard } from "./components/MotionPrimitives";
 import { SmoothScrollProvider, useSmoothScroll } from "./components/SmoothScroll";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -131,6 +131,24 @@ const stats = [
   ["100%", "Builder mindset"]
 ];
 
+const smoothEase = [0.22, 1, 0.36, 1] as const;
+
+function AnimatedStatValue({ value }: { value: string }) {
+  const isPercent = value.endsWith("%");
+  const numericValue = Number(value.replace("%", ""));
+
+  if (Number.isNaN(numericValue)) {
+    return value;
+  }
+
+  return (
+    <>
+      {value.startsWith("0") && numericValue < 10 ? "0" : ""}
+      <AnimatedNumber value={numericValue} suffix={isPercent ? "%" : ""} />
+    </>
+  );
+}
+
 function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
@@ -186,15 +204,20 @@ function ProjectCard({ project, index }: { project: (typeof projects)[number]; i
   return (
     <Reveal delay={index * 0.08}>
       <TiltCard className="project-card group h-full min-h-[520px] w-[82vw] max-w-[430px] shrink-0 rounded-lg md:w-[430px]">
-        <a
+        <motion.a
           href={project.href}
           target="_blank"
           rel="noreferrer"
+          whileTap={{ scale: 0.985 }}
           className="glass relative flex h-full flex-col overflow-hidden rounded-lg p-4 transition hover:border-cyan-200/45"
         >
-          <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
+          <motion.div
+            className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100"
+            initial={false}
+            whileHover={{ opacity: 1 }}
+          >
             <div className={`h-full w-full bg-gradient-to-br ${project.accent} opacity-10`} />
-          </div>
+          </motion.div>
           <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-white/10 bg-slate-950/70">
             <Image
               src={project.preview}
@@ -204,9 +227,15 @@ function ProjectCard({ project, index }: { project: (typeof projects)[number]; i
               className="object-cover object-top transition duration-700 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/10 to-transparent" />
-            <span className="absolute left-4 top-4 rounded-md border border-cyan-200/25 bg-cyan-200/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+            <motion.span
+              initial={{ opacity: 0, y: -8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.18 + index * 0.04 }}
+              className="absolute left-4 top-4 rounded-md border border-cyan-200/25 bg-cyan-200/10 px-3 py-1 text-xs font-semibold text-cyan-100"
+            >
               {project.metric}
-            </span>
+            </motion.span>
           </div>
           <div className="relative flex flex-1 flex-col p-2 pt-5">
             <div className="flex items-start justify-between gap-4">
@@ -214,20 +243,25 @@ function ProjectCard({ project, index }: { project: (typeof projects)[number]; i
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-200">{project.type}</p>
                 <h3 className="mt-2 text-2xl font-semibold text-white">{project.name}</h3>
               </div>
-              <span className="grid size-10 shrink-0 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-cyan-200 transition group-hover:-translate-y-1 group-hover:translate-x-1">
+              <motion.span
+                whileHover={{ rotate: 12 }}
+                className="grid size-10 shrink-0 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-cyan-200 transition group-hover:-translate-y-1 group-hover:translate-x-1"
+              >
                 <ArrowUpRight size={18} />
-              </span>
+              </motion.span>
             </div>
             <p className="mt-4 text-sm leading-6 text-slate-300">{project.summary}</p>
-            <div className="mt-auto flex flex-wrap gap-2 pt-6">
+            <StaggerReveal className="mt-auto flex flex-wrap gap-2 pt-6" delay={0.1} stagger={0.045}>
               {project.stack.map((item) => (
-                <span key={item} className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-200">
-                  {item}
-                </span>
+                <StaggerItem key={item}>
+                  <span className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-200">
+                    {item}
+                  </span>
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerReveal>
           </div>
-        </a>
+        </motion.a>
       </TiltCard>
     </Reveal>
   );
@@ -251,7 +285,11 @@ function AIAssistant() {
   ];
 
   return (
-    <div className="glass rounded-lg p-4">
+    <motion.div
+      className="glass rounded-lg p-4"
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 260, damping: 24 }}
+    >
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="grid size-9 place-items-center rounded-md bg-cyan-300/15 text-cyan-200">
@@ -266,9 +304,11 @@ function AIAssistant() {
       </div>
       <div className="space-y-2">
         {prompts.map((prompt, index) => (
-          <button
+          <motion.button
             key={prompt}
             onClick={() => setActive(index)}
+            whileHover={{ x: 5 }}
+            whileTap={{ scale: 0.985 }}
             className={`w-full rounded-md border px-3 py-2 text-left text-xs transition ${
               active === index
                 ? "border-cyan-200/60 bg-cyan-200/10 text-cyan-50"
@@ -276,18 +316,19 @@ function AIAssistant() {
             }`}
           >
             {prompt}
-          </button>
+          </motion.button>
         ))}
       </div>
       <motion.div
         key={active}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 12, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: 0.38, ease: smoothEase }}
         className="mt-4 rounded-md border border-white/10 bg-slate-950/60 p-3 text-sm leading-6 text-slate-200"
       >
         {replies[active]}
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -306,10 +347,24 @@ function HeroShowcase() {
   return (
     <div className="hero-showcase relative min-h-[560px]">
       <div className="absolute -inset-6 rounded-full bg-cyan-300/10 blur-3xl" />
-      <div className="absolute right-3 top-5 h-40 w-40 rounded-full border border-cyan-200/20 bg-cyan-200/5 blur-sm" />
-      <div className="absolute bottom-24 left-0 h-36 w-36 rounded-full border border-violet-200/20 bg-violet-300/5 blur-sm" />
+      <motion.div
+        aria-hidden="true"
+        animate={{ y: [0, -16, 0], scale: [1, 1.05, 1] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute right-3 top-5 h-40 w-40 rounded-full border border-cyan-200/20 bg-cyan-200/5 blur-sm"
+      />
+      <motion.div
+        aria-hidden="true"
+        animate={{ y: [0, 18, 0], x: [0, 10, 0], scale: [1, 0.96, 1] }}
+        transition={{ duration: 8.5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-24 left-0 h-36 w-36 rounded-full border border-violet-200/20 bg-violet-300/5 blur-sm"
+      />
 
-      <div className="glass relative overflow-hidden rounded-lg p-4">
+      <motion.div
+        className="glass relative overflow-hidden rounded-lg p-4"
+        whileHover={{ y: -6 }}
+        transition={{ type: "spring", stiffness: 220, damping: 24 }}
+      >
         <div className="mb-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Image
@@ -381,34 +436,45 @@ function HeroShowcase() {
           {stats.map(([value, label], index) => (
             <motion.div
               key={label}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.12 + index * 0.06 }}
+              initial={{ opacity: 0, y: 16, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              whileHover={{ y: -4, borderColor: "rgba(103, 232, 249, 0.45)" }}
+              transition={{ delay: 0.12 + index * 0.06, ease: smoothEase }}
               className="rounded-md border border-white/10 bg-white/[0.04] p-3"
             >
-              <p className="text-2xl font-semibold text-white">{value}</p>
+              <p className="text-2xl font-semibold text-white">
+                <AnimatedStatValue value={value} />
+              </p>
               <p className="mt-1 text-xs text-slate-400">{label}</p>
             </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-[1fr_0.92fr]">
-        <div className="glass rounded-lg p-4">
+        <motion.div className="glass rounded-lg p-4" whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 260, damping: 24 }}>
           <p className="text-sm font-semibold text-white">Project transitions</p>
           <div className="mt-4 flex gap-2">
             {projects.map((item, index) => (
               <button
                 key={item.name}
                 onClick={() => setActiveProject(index)}
-                className={`h-2 flex-1 rounded-full transition ${
+                className={`relative h-2 flex-1 overflow-hidden rounded-full transition ${
                   index === activeProject ? "bg-cyan-300 shadow-glow" : "bg-white/15 hover:bg-white/30"
                 }`}
                 aria-label={`Show ${item.name}`}
-              />
+              >
+                {index === activeProject && (
+                  <motion.span
+                    layoutId="active-project-pill"
+                    className="absolute inset-0 rounded-full bg-cyan-300"
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                  />
+                )}
+              </button>
             ))}
           </div>
-        </div>
+        </motion.div>
         <AIAssistant />
       </div>
     </div>
@@ -561,69 +627,92 @@ function HomeContent() {
       <div className="noise-layer pointer-events-none fixed inset-0 z-0 opacity-[0.055]" />
 
       <header className="fixed left-0 right-0 top-4 z-40 px-4">
-        <nav className="glass mx-auto flex max-w-6xl items-center justify-between rounded-lg px-3 py-3">
+        <motion.nav
+          initial={{ opacity: 0, y: -18, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.55, ease: smoothEase }}
+          className="glass mx-auto flex max-w-6xl items-center justify-between rounded-lg px-3 py-3"
+        >
           <a href="#top" onClick={(event) => scrollToSection(event, "#top")} className="flex items-center gap-2 text-sm font-semibold text-white">
-            <span className="grid size-8 place-items-center rounded-md bg-cyan-300 text-slate-950 shadow-glow">K</span>
+            <motion.span
+              whileHover={{ rotate: -8, scale: 1.08 }}
+              whileTap={{ scale: 0.94 }}
+              className="grid size-8 place-items-center rounded-md bg-cyan-300 text-slate-950 shadow-glow"
+            >
+              K
+            </motion.span>
             Kapil.dev
           </a>
           <div className="hidden items-center gap-1 md:flex">
             {navItems.map((item) => (
-              <a
+              <motion.a
                 key={item}
                 href={`#${item.toLowerCase()}`}
                 onClick={(event) => scrollToSection(event, `#${item.toLowerCase()}`)}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.97 }}
                 className="rounded-md px-3 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white"
               >
                 {item}
-              </a>
+              </motion.a>
             ))}
           </div>
           <div className="hidden items-center gap-2 md:flex">
-            <button
+            <motion.button
               onClick={() => setTheme((value) => (value === "dark" ? "light" : "dark"))}
+              whileTap={{ rotate: 20, scale: 0.92 }}
               className="grid size-9 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-slate-300 transition hover:text-white"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-            </button>
-            <a href="https://github.com/kapilkurchaniya" target="_blank" rel="noopener noreferrer" className="grid size-9 place-items-center rounded-md border border-white/10 text-slate-300 hover:text-white" aria-label="GitHub">
+            </motion.button>
+            <motion.a whileHover={{ y: -2 }} whileTap={{ scale: 0.94 }} href="https://github.com/kapilkurchaniya" target="_blank" rel="noopener noreferrer" className="grid size-9 place-items-center rounded-md border border-white/10 text-slate-300 hover:text-white" aria-label="GitHub">
               <Github size={17} />
-            </a>
-            <a href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" target="_blank" rel="noopener noreferrer" className="grid size-9 place-items-center rounded-md border border-white/10 text-slate-300 hover:text-white" aria-label="LinkedIn">
+            </motion.a>
+            <motion.a whileHover={{ y: -2 }} whileTap={{ scale: 0.94 }} href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" target="_blank" rel="noopener noreferrer" className="grid size-9 place-items-center rounded-md border border-white/10 text-slate-300 hover:text-white" aria-label="LinkedIn">
               <Linkedin size={17} />
-            </a>
+            </motion.a>
           </div>
           <div className="flex items-center gap-2 md:hidden">
-            <button
+            <motion.button
               onClick={() => setTheme((value) => (value === "dark" ? "light" : "dark"))}
+              whileTap={{ rotate: 20, scale: 0.92 }}
               className="grid size-9 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-white"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-            </button>
-            <button className="grid size-9 place-items-center rounded-md border border-white/10 text-white" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle menu">
+            </motion.button>
+            <motion.button whileTap={{ scale: 0.92 }} className="grid size-9 place-items-center rounded-md border border-white/10 text-white" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle menu">
               {menuOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
+            </motion.button>
           </div>
-        </nav>
+        </motion.nav>
+        <AnimatePresence>
         {menuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.26, ease: smoothEase }}
             className="glass mx-auto mt-2 grid max-w-6xl gap-1 rounded-lg p-2 md:hidden"
           >
             {navItems.map((item) => (
-              <a
+              <motion.a
                 key={item}
                 href={`#${item.toLowerCase()}`}
                 onClick={(event) => scrollToSection(event, `#${item.toLowerCase()}`)}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                whileTap={{ scale: 0.98 }}
                 className="rounded-md px-3 py-3 text-sm text-slate-200"
               >
                 {item}
-              </a>
+              </motion.a>
             ))}
           </motion.div>
         )}
+        </AnimatePresence>
       </header>
 
       <section
@@ -686,14 +775,18 @@ function HomeContent() {
               Contact <Mail size={17} />
             </GlowButton>
           </div>
-          <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-300">
-            <span className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
+          <StaggerReveal className="mt-8 flex flex-wrap gap-3 text-sm text-slate-300" delay={0.42} stagger={0.09}>
+            <StaggerItem>
+            <motion.span whileHover={{ y: -3 }} className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
               <MapPin size={16} className="text-cyan-200" /> Bhopal, India
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
+            </motion.span>
+            </StaggerItem>
+            <StaggerItem>
+            <motion.span whileHover={{ y: -3 }} className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
               <Rocket size={16} className="text-violet-200" /> MERN + AI apps
-            </span>
-          </div>
+            </motion.span>
+            </StaggerItem>
+          </StaggerReveal>
         </div>
 
         <HeroShowcase />
@@ -729,10 +822,17 @@ function HomeContent() {
             title="Preview the work without slowing the show."
             copy="Captured previews keep scrolling smooth while every card still opens the real deployed project."
           />
-          <div className="grid gap-5 md:grid-cols-2">
-            {projects.map((project, index) => (
-              <Reveal key={project.name} delay={index * 0.06}>
-                <a href={project.href} target="_blank" rel="noreferrer" className="glass group block overflow-hidden rounded-lg transition hover:-translate-y-1 hover:border-cyan-200/40">
+          <StaggerReveal className="grid gap-5 md:grid-cols-2" stagger={0.08}>
+            {projects.map((project) => (
+              <StaggerItem key={project.name}>
+                <motion.a
+                  href={project.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  whileHover={{ y: -8, scale: 1.01 }}
+                  whileTap={{ scale: 0.985 }}
+                  className="glass group block overflow-hidden rounded-lg transition hover:border-cyan-200/40"
+                >
                   <div className="relative aspect-[16/9] overflow-hidden bg-slate-950/70">
                     <Image src={project.preview} alt={`${project.name} live preview`} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover object-top transition duration-700 group-hover:scale-105" />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
@@ -746,10 +846,10 @@ function HomeContent() {
                       </span>
                     </div>
                   </div>
-                </a>
-              </Reveal>
+                </motion.a>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerReveal>
         </div>
       </section>
 
@@ -760,14 +860,22 @@ function HomeContent() {
             title="Floating tools for modern product engineering."
             copy="A motion-first skill grid that highlights frontend craft, backend delivery, data flow, animation, and 3D interaction."
           />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {skills.map(([label, level, Icon], index) => (
-              <Reveal key={label} delay={index * 0.035}>
-                <div className="glass group rounded-lg p-5 transition hover:-translate-y-1 hover:border-cyan-200/35">
+          <StaggerReveal className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" stagger={0.045}>
+            {skills.map(([label, level, Icon]) => (
+              <StaggerItem key={label}>
+                <motion.div
+                  className="glass group rounded-lg p-5 transition hover:border-cyan-200/35"
+                  whileHover={{ y: -7, scale: 1.015 }}
+                  whileTap={{ scale: 0.99 }}
+                >
                   <div className="mb-5 flex items-center justify-between">
-                    <span className="grid size-11 place-items-center rounded-md bg-white/10 text-cyan-200 transition group-hover:bg-cyan-300 group-hover:text-slate-950">
+                    <motion.span
+                      whileHover={{ rotate: [0, -8, 8, 0] }}
+                      transition={{ duration: 0.42 }}
+                      className="grid size-11 place-items-center rounded-md bg-white/10 text-cyan-200 transition group-hover:bg-cyan-300 group-hover:text-slate-950"
+                    >
                       <Icon size={21} />
-                    </span>
+                    </motion.span>
                     <span className="text-sm font-semibold text-cyan-100">{level}%</span>
                   </div>
                   <h3 className="text-lg font-semibold text-white">{label}</h3>
@@ -780,10 +888,10 @@ function HomeContent() {
                       className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-violet-300 to-fuchsia-300"
                     />
                   </div>
-                </div>
-              </Reveal>
+                </motion.div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerReveal>
         </div>
       </section>
 
@@ -797,16 +905,23 @@ function HomeContent() {
           <div className="space-y-4">
             {timeline.map(({ title, org, detail, icon: Icon }, index) => (
               <Reveal key={title} delay={index * 0.08}>
-                <div className="glass grid gap-4 rounded-lg p-5 md:grid-cols-[auto_1fr]">
-                  <span className="grid size-12 place-items-center rounded-md bg-cyan-300/15 text-cyan-200">
+                <motion.div
+                  className="glass grid gap-4 rounded-lg p-5 md:grid-cols-[auto_1fr]"
+                  whileHover={{ x: 6, borderColor: "rgba(103, 232, 249, 0.35)" }}
+                  transition={{ type: "spring", stiffness: 240, damping: 24 }}
+                >
+                  <motion.span
+                    whileHover={{ rotate: 8, scale: 1.06 }}
+                    className="grid size-12 place-items-center rounded-md bg-cyan-300/15 text-cyan-200"
+                  >
                     <Icon size={22} />
-                  </span>
+                  </motion.span>
                   <div>
                     <h3 className="text-xl font-semibold text-white">{title}</h3>
                     <p className="mt-1 text-sm font-medium text-violet-200">{org}</p>
                     <p className="mt-3 text-sm leading-6 text-slate-300">{detail}</p>
                   </div>
-                </div>
+                </motion.div>
               </Reveal>
             ))}
           </div>
@@ -821,30 +936,36 @@ function HomeContent() {
             <p className="mt-4 text-base leading-7 text-slate-300">
               The portfolio links directly to GitHub and frames LeetCode as a strength in time complexity, space optimization, and advanced data structures.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <GlowButton href="https://github.com/kapilkurchaniya" variant="secondary">
-                GitHub <Github size={17} />
-              </GlowButton>
-              <GlowButton href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" variant="secondary">
-                LinkedIn <Linkedin size={17} />
-              </GlowButton>
-            </div>
+              <StaggerReveal className="mt-6 flex flex-wrap gap-3" delay={0.12} stagger={0.08}>
+                <StaggerItem>
+                <GlowButton href="https://github.com/kapilkurchaniya" variant="secondary">
+                  GitHub <Github size={17} />
+                </GlowButton>
+                </StaggerItem>
+                <StaggerItem>
+                <GlowButton href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" variant="secondary">
+                  LinkedIn <Linkedin size={17} />
+                </GlowButton>
+                </StaggerItem>
+              </StaggerReveal>
           </Reveal>
           <Reveal delay={0.12}>
             <div className="glass rounded-lg p-5">
-              <div className="grid gap-3 sm:grid-cols-2">
+              <StaggerReveal className="grid gap-3 sm:grid-cols-2" stagger={0.07}>
                 {[
                   ["Stacks + queues", "Core DSA"],
                   ["BST + OOP", "Problem models"],
                   ["Time complexity", "Optimization"],
                   ["Space complexity", "Competitive programming"]
                 ].map(([title, label]) => (
-                  <div key={title} className="rounded-md border border-white/10 bg-white/[0.04] p-4">
+                  <StaggerItem key={title}>
+                  <motion.div whileHover={{ y: -5, scale: 1.015 }} className="rounded-md border border-white/10 bg-white/[0.04] p-4">
                     <p className="text-lg font-semibold text-white">{title}</p>
                     <p className="mt-2 text-sm text-slate-400">{label}</p>
-                  </div>
+                  </motion.div>
+                  </StaggerItem>
                 ))}
-              </div>
+              </StaggerReveal>
             </div>
           </Reveal>
         </div>
@@ -874,41 +995,63 @@ function HomeContent() {
                 </GlowButton>
               </div>
             </div>
-            <form className="space-y-4" onSubmit={handleContactSubmit}>
+            <motion.form
+              className="space-y-4"
+              onSubmit={handleContactSubmit}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-80px" }}
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
+            >
               {[
                 ["name", "Your name"],
                 ["email", "Email address"],
                 ["message", "Project idea"]
               ].map(([name, placeholder]) =>
                 name === "message" ? (
-                  <textarea
+                  <motion.textarea
                     key={name}
                     name={name}
                     placeholder={placeholder}
                     rows={5}
+                    variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
+                    whileFocus={{ scale: 1.01 }}
                     className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-200/60 focus:bg-cyan-200/5"
                   />
                 ) : (
-                  <input
+                  <motion.input
                     key={name}
                     name={name}
                     placeholder={placeholder}
+                    variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
+                    whileFocus={{ scale: 1.01 }}
                     className="h-12 w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-200/60 focus:bg-cyan-200/5"
                   />
                 )
               )}
-              <button
+              <motion.button
                 disabled={contactStatus === "sending"}
+                variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
+                whileHover={{ y: -3 }}
+                whileTap={{ scale: 0.97 }}
                 className="inline-flex min-h-12 items-center gap-2 rounded-md bg-cyan-300 px-5 text-sm font-semibold text-slate-950 shadow-glow transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {contactStatus === "sending" ? "Sending..." : "Send signal"} <Send size={17} />
-              </button>
-              {contactMessage && (
-                <p className={`text-sm ${contactStatus === "sent" ? "text-emerald-200" : "text-rose-200"}`}>
-                  {contactMessage}
-                </p>
-              )}
-            </form>
+              </motion.button>
+              <AnimatePresence mode="wait">
+                {contactMessage && (
+                  <motion.p
+                    key={contactMessage}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    className={`text-sm ${contactStatus === "sent" ? "text-emerald-200" : "text-rose-200"}`}
+                  >
+                    {contactMessage}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </motion.form>
           </div>
         </Reveal>
       </section>
