@@ -1,0 +1,19 @@
+
+> kapil-ai-portfolio@0.1.0 dev
+> next dev
+
+[32m✔[0m [33mConsole Ninja[0m extension is connected to [33mNext.js[0m, see [36mhttps://tinyurl.com/2vt8jxzw[0m
+   ▲ Next.js 15.5.18
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.4:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 4.3s
+ ○ Compiling / ...
+ ✓ Compiled / in 13.7s (1370 modules)
+ ✓ Compiled in 4.6s (645 modules)
+ GET / 200 in 18366ms
+ GET / 200 in 1074ms
+ GET / 200 in 1202ms
+ GET / 200 in 875ms
