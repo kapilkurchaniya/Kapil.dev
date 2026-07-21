@@ -12,8 +12,30 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Kapil Kurchaniya | AI Engineer + Full Stack Product Builder",
   description:
-    "Modern portfolio for Kapil Kurchaniya, an AI-focused full stack developer building MERN products, dashboards, and scalable frontend systems."
+    "Modern portfolio for Kapil Kurchaniya, an AI-focused full stack developer building MERN products, dashboards, and scalable frontend systems.",
+  keywords: ["Kapil Kurchaniya", "Full Stack Developer", "AI Engineer", "React", "Next.js", "MERN", "Portfolio"],
+  authors: [{ name: "Kapil Kurchaniya" }],
+  openGraph: {
+    title: "Kapil Kurchaniya | AI Engineer + Full Stack Product Builder",
+    description:
+      "Modern portfolio for Kapil Kurchaniya, an AI-focused full stack developer building MERN products, dashboards, and scalable frontend systems.",
+    url: "https://kapilkurchaniya.vercel.app",
+    siteName: "Kapil Kurchaniya Portfolio",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kapil Kurchaniya | AI Engineer + Full Stack Product Builder",
+    description:
+      "Modern portfolio for Kapil Kurchaniya, an AI-focused full stack developer.",
+  },
+  other: {
+    "theme-color": "#050713",
+  },
 };
+
+import { CustomCursor } from "./components/CustomCursor";
 
 export default function RootLayout({
   children
@@ -22,7 +44,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+      <head>
+        <meta name="theme-color" content="#050713" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#f8fbff" media="(prefers-color-scheme: light)" />
+      </head>
+      <body className={`${inter.variable} antialiased`}>
+        <CustomCursor />
+        {children}
+      </body>
     </html>
   );
 }
