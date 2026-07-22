@@ -31,9 +31,12 @@ import {
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatedNumber, Magnetic, Reveal, StaggerItem, StaggerReveal, TiltCard } from "./components/MotionPrimitives";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatedNumber, FloatingOverlay, Magnetic, ParallaxLayer, Reveal, StaggerItem, StaggerReveal, TiltCard } from "./components/MotionPrimitives";
+import { TextReveal } from "./components/TextReveal";
 import { SmoothScrollProvider, useSmoothScroll } from "./components/SmoothScroll";
+import { ContactForm } from "./components/ContactForm";
+import { Footer } from "./components/Footer";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -182,8 +185,42 @@ const stats = [
   ["100%", "Builder mindset"]
 ];
 
+const roles = ["Full Stack Developer", "Creative Frontend Engineer", "AI Builder", "Product Thinker"];
+
 const smoothEase = [0.22, 1, 0.36, 1] as const;
 
+/* ───────── Floating Particles ───────── */
+const particles = [
+  { size: 4, left: "12%", top: "18%", duration: "7s", delay: "0s" },
+  { size: 3, left: "78%", top: "22%", duration: "9s", delay: "1.2s" },
+  { size: 5, left: "45%", top: "72%", duration: "8s", delay: "0.5s" },
+  { size: 3, left: "88%", top: "55%", duration: "10s", delay: "2s" },
+  { size: 4, left: "25%", top: "65%", duration: "7.5s", delay: "1.8s" },
+  { size: 2, left: "62%", top: "35%", duration: "11s", delay: "0.8s" },
+];
+
+function HeroParticles() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      {particles.map((p, i) => (
+        <div
+          key={i}
+          className="floating-particle absolute rounded-full bg-cyan-300/40"
+          style={{
+            width: p.size,
+            height: p.size,
+            left: p.left,
+            top: p.top,
+            "--duration": p.duration,
+            "--delay": p.delay,
+          } as React.CSSProperties}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ───────── Preloader ───────── */
 function PortfolioPreloader({ onComplete }: { onComplete: () => void }) {
   useEffect(() => {
     const timer = window.setTimeout(onComplete, 850);
@@ -208,6 +245,7 @@ function PortfolioPreloader({ onComplete }: { onComplete: () => void }) {
   );
 }
 
+/* ───────── Animated stat value ───────── */
 function AnimatedStatValue({ value }: { value: string }) {
   const isPercent = value.endsWith("%");
   const numericValue = Number(value.replace("%", ""));
@@ -224,6 +262,7 @@ function AnimatedStatValue({ value }: { value: string }) {
   );
 }
 
+/* ───────── Scroll progress ───────── */
 function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
@@ -231,16 +270,24 @@ function ScrollProgress() {
   return <motion.div className="fixed left-0 top-0 z-50 h-1 origin-left bg-cyan-300 shadow-glow" style={{ scaleX }} />;
 }
 
+/* ───────── Section heading ───────── */
 function SectionHeading({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
   return (
-    <Reveal className="mx-auto mb-12 max-w-3xl text-center">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">{eyebrow}</p>
-      <h2 className="text-balance text-3xl font-semibold text-white sm:text-5xl">{title}</h2>
-      <p className="mt-4 text-base leading-7 text-slate-300">{copy}</p>
-    </Reveal>
+    <div className="mx-auto mb-12 max-w-3xl text-center">
+      <Reveal delay={0}>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">{eyebrow}</p>
+      </Reveal>
+      <h2 className="text-balance text-3xl font-semibold text-white sm:text-5xl my-2">
+        <TextReveal text={title} delay={0.15} />
+      </h2>
+      <Reveal delay={0.3}>
+        <p className="mt-4 text-base leading-7 text-slate-300">{copy}</p>
+      </Reveal>
+    </div>
   );
 }
 
+/* ───────── GlowButton ───────── */
 function GlowButton({
   href,
   children,
@@ -275,90 +322,177 @@ function GlowButton({
   );
 }
 
+/* ───────── Animated Role Ticker ───────── */
+function RoleTicker() {
+  const [activeRole, setActiveRole] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveRole((v) => (v + 1) % roles.length);
+    }, 2500);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="mt-4 h-12 overflow-hidden">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={roles[activeRole]}
+          initial={{ y: 32, opacity: 0, filter: "blur(6px)" }}
+          animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+          exit={{ y: -32, opacity: 0, filter: "blur(6px)" }}
+          transition={{ duration: 0.45, ease: smoothEase }}
+          className="flex items-center gap-3"
+        >
+          <span className="rounded-md border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-slate-200">
+            {roles[activeRole]}
+          </span>
+          <span className="h-px flex-1 bg-gradient-to-r from-cyan-300/40 to-transparent" />
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ───────── ProjectCard with FloatingOverlay + spotlight glow ───────── */
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
     <Reveal delay={index * 0.08}>
       <TiltCard className="project-card group h-full min-h-[520px] w-[82vw] max-w-[430px] shrink-0 rounded-lg md:w-[430px]">
-        <motion.div
-          whileTap={{ scale: 0.985 }}
-          className="glass relative flex h-full flex-col overflow-hidden rounded-lg p-4 transition hover:border-cyan-200/45"
-        >
+        <FloatingOverlay>
           <motion.div
-            className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100"
-            initial={false}
-            whileHover={{ opacity: 1 }}
+            whileTap={{ scale: 0.985 }}
+            whileHover={{
+              boxShadow: `0 0 60px ${
+                project.accent.includes("cyan") ? "rgba(103, 232, 249, 0.12)" :
+                project.accent.includes("emerald") ? "rgba(52, 211, 153, 0.12)" :
+                project.accent.includes("rose") ? "rgba(251, 113, 133, 0.12)" :
+                "rgba(139, 92, 246, 0.12)"
+              }`,
+            }}
+            className="glass relative flex h-full flex-col overflow-hidden rounded-lg p-4 transition hover:border-cyan-200/45"
           >
-            <div className={`h-full w-full bg-gradient-to-br ${project.accent} opacity-10`} />
-          </motion.div>
-          <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-white/10 bg-slate-950/70">
-            <Image
-              src={project.preview}
-              alt={`${project.name} project preview`}
-              fill
-              sizes="(max-width: 768px) 82vw, 430px"
-              className="object-cover object-top transition duration-700 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/10 to-transparent" />
-            <motion.span
-              initial={{ opacity: 0, y: -8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.18 + index * 0.04 }}
-              className="absolute left-4 top-4 z-10 rounded-md border border-cyan-200/45 bg-slate-950/85 px-3 py-1 text-xs font-semibold text-cyan-100 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-md"
+            <motion.div
+              className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100"
+              initial={false}
+              whileHover={{ opacity: 1 }}
             >
-              {project.metric}
-            </motion.span>
-          </div>
-          <div className="relative flex flex-1 flex-col p-2 pt-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-200">{project.type}</p>
-                <h3 className="mt-2 text-2xl font-semibold text-white">{project.name}</h3>
-              </div>
-              <div className="flex shrink-0 gap-2">
-                {project.github && (
-                  <motion.a
-                    href={project.github}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`${project.name} GitHub repository`}
-                    whileHover={{ y: -3 }}
-                    className="grid size-10 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-slate-300 transition hover:border-white/25 hover:text-white"
-                  >
-                    <Github size={18} />
-                  </motion.a>
-                )}
-                {project.href && (
-                  <motion.a
-                    href={project.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`Open ${project.name}`}
-                    whileHover={{ rotate: 12 }}
-                    className="grid size-10 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-cyan-200 transition group-hover:-translate-y-1 group-hover:translate-x-1"
-                  >
-                    <ArrowUpRight size={18} />
-                  </motion.a>
-                )}
-              </div>
+              <div className={`h-full w-full bg-gradient-to-br ${project.accent} opacity-10`} />
+            </motion.div>
+            <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-white/10 bg-slate-950/70">
+              <Image
+                src={project.preview}
+                alt={`${project.name} project preview`}
+                fill
+                sizes="(max-width: 768px) 82vw, 430px"
+                className="object-cover object-top transition duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/10 to-transparent" />
+              <motion.span
+                initial={{ opacity: 0, y: -8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.18 + index * 0.04 }}
+                className="absolute left-4 top-4 z-10 rounded-md border border-cyan-200/45 bg-slate-950/85 px-3 py-1 text-xs font-semibold text-cyan-100 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-md"
+              >
+                {project.metric}
+              </motion.span>
             </div>
-            <p className="mt-4 text-sm leading-6 text-slate-300">{project.summary}</p>
-            <StaggerReveal className="mt-auto flex flex-wrap gap-2 pt-6" delay={0.1} stagger={0.045}>
-              {project.stack.map((item) => (
-                <StaggerItem key={item}>
-                  <span className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-200">
-                    {item}
-                  </span>
-                </StaggerItem>
-              ))}
-            </StaggerReveal>
-          </div>
-        </motion.div>
+            <div className="relative flex flex-1 flex-col p-2 pt-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-200">{project.type}</p>
+                  <h3 className="mt-2 text-2xl font-semibold text-white">{project.name}</h3>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  {project.github && (
+                    <motion.a
+                      href={project.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`${project.name} GitHub repository`}
+                      whileHover={{ y: -3 }}
+                      className="grid size-10 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-slate-300 transition hover:border-white/25 hover:text-white"
+                    >
+                      <Github size={18} />
+                    </motion.a>
+                  )}
+                  {project.href && (
+                    <motion.a
+                      href={project.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Open ${project.name}`}
+                      whileHover={{ rotate: 12 }}
+                      className="grid size-10 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-cyan-200 transition group-hover:-translate-y-1 group-hover:translate-x-1"
+                    >
+                      <ArrowUpRight size={18} />
+                    </motion.a>
+                  )}
+                </div>
+              </div>
+              <p className="mt-4 text-sm leading-6 text-slate-300">{project.summary}</p>
+              <StaggerReveal className="mt-auto flex flex-wrap gap-2 pt-6" delay={0.1} stagger={0.045}>
+                {project.stack.map((item) => (
+                  <StaggerItem key={item}>
+                    <span className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-200">
+                      {item}
+                    </span>
+                  </StaggerItem>
+                ))}
+              </StaggerReveal>
+            </div>
+          </motion.div>
+        </FloatingOverlay>
       </TiltCard>
     </Reveal>
   );
 }
 
+/* ───────── Live project card with scroll-through hover ───────── */
+function LiveProjectCard({ project }: { project: Project & { href: string } }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.a
+      href={project.href}
+      target="_blank"
+      rel="noreferrer"
+      whileHover={{ y: -8, scale: 1.01 }}
+      whileTap={{ scale: 0.985 }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="glass group block overflow-hidden rounded-lg transition hover:border-cyan-200/40"
+    >
+      <div className="relative aspect-[16/9] overflow-hidden bg-slate-950/70">
+        <Image
+          src={project.preview}
+          alt={`${project.name} live preview`}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="transition duration-[3000ms] ease-in-out"
+          style={{
+            objectFit: "cover",
+            objectPosition: isHovered ? "bottom" : "top",
+            transform: isHovered ? "scale(1.05)" : "scale(1)",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-100">{project.type}</p>
+            <h3 className="mt-1 text-2xl font-semibold text-white">{project.name}</h3>
+          </div>
+          <span className="grid size-11 place-items-center rounded-md bg-cyan-300 text-slate-950 shadow-glow">
+            <ArrowUpRight size={18} />
+          </span>
+        </div>
+      </div>
+    </motion.a>
+  );
+}
+
+/* ───────── AI Assistant ───────── */
 function AIAssistant() {
   const prompts = useMemo(
     () => [
@@ -424,6 +558,7 @@ function AIAssistant() {
   );
 }
 
+/* ───────── Hero Showcase ───────── */
 function HeroShowcase() {
   const [activeProject, setActiveProject] = useState(0);
   const project = projects[activeProject];
@@ -573,12 +708,108 @@ function HeroShowcase() {
   );
 }
 
+/* ───────── Orbit Animation (Stats section) ───────── */
+function SkillOrbit() {
+  const dsaTopics = [
+    { label: "Stacks + Queues", color: "bg-cyan-300/20 text-cyan-100 border-cyan-300/30" },
+    { label: "BST + OOP", color: "bg-violet-300/20 text-violet-100 border-violet-300/30" },
+    { label: "Time Complexity", color: "bg-emerald-300/20 text-emerald-100 border-emerald-300/30" },
+    { label: "Space Complexity", color: "bg-rose-300/20 text-rose-100 border-rose-300/30" },
+  ];
+
+  return (
+    <div className="relative mx-auto flex aspect-square max-w-[320px] items-center justify-center">
+      {/* Outer orbit ring */}
+      <div className="orbit-ring absolute h-[260px] w-[260px] rounded-full border border-white/10" />
+      {/* Inner orbit ring */}
+      <div className="orbit-ring absolute h-[180px] w-[180px] rounded-full border border-white/[0.06]" style={{ animationDelay: "2s" }} />
+
+      {/* Center node */}
+      <div className="relative z-10 flex flex-col items-center gap-1 rounded-xl border border-cyan-200/30 bg-cyan-200/10 px-5 py-4 text-center shadow-glow backdrop-blur-sm">
+        <BrainCircuit size={22} className="text-cyan-200" />
+        <span className="text-xs font-bold uppercase tracking-[0.15em] text-cyan-100">Problem Solving</span>
+      </div>
+
+      {/* Orbiting items */}
+      {dsaTopics.map((topic, i) => (
+        <div
+          key={topic.label}
+          className="orbit-item absolute"
+          style={{
+            "--orbit-radius": "120px",
+            "--orbit-duration": `${16 + i * 3}s`,
+            animationDelay: `${i * -4}s`,
+            animationDirection: i % 2 === 0 ? "normal" : "reverse",
+          } as React.CSSProperties}
+        >
+          <span
+            className={`whitespace-nowrap rounded-md border px-3 py-1.5 text-[11px] font-semibold backdrop-blur-sm ${topic.color}`}
+          >
+            {topic.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ───────── Decorative GitHub Heatmap ───────── */
+function GitHubHeatmap() {
+  const weeks = 20;
+  const days = 7;
+
+  // Deterministic "random" pattern using index
+  const getIntensity = (week: number, day: number) => {
+    const seed = (week * 7 + day * 13 + 42) % 100;
+    if (seed > 75) return "bg-emerald-400/80";
+    if (seed > 55) return "bg-emerald-400/50";
+    if (seed > 35) return "bg-emerald-400/25";
+    if (seed > 20) return "bg-emerald-400/10";
+    return "bg-white/[0.04]";
+  };
+
+  return (
+    <Reveal delay={0.2}>
+      <div className="glass mt-6 overflow-hidden rounded-lg p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <p className="text-sm font-semibold text-white">Contribution pattern</p>
+          <span className="text-xs text-slate-500">Decorative</span>
+        </div>
+        <div className="flex gap-[3px] overflow-x-auto no-scrollbar">
+          {Array.from({ length: weeks }).map((_, w) => (
+            <div key={w} className="flex flex-col gap-[3px]">
+              {Array.from({ length: days }).map((_, d) => (
+                <motion.div
+                  key={`${w}-${d}`}
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.01 * (w + d), duration: 0.3 }}
+                  className={`h-[10px] w-[10px] rounded-[2px] ${getIntensity(w, d)}`}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 flex items-center gap-2 text-[10px] text-slate-500">
+          <span>Less</span>
+          <div className="flex gap-1">
+            {["bg-white/[0.04]", "bg-emerald-400/10", "bg-emerald-400/25", "bg-emerald-400/50", "bg-emerald-400/80"].map((c) => (
+              <div key={c} className={`h-[10px] w-[10px] rounded-[2px] ${c}`} />
+            ))}
+          </div>
+          <span>More</span>
+        </div>
+      </div>
+    </Reveal>
+  );
+}
+
+/* ───────── Home Content ───────── */
 function HomeContent() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [booting, setBooting] = useState(true);
-  const [contactStatus, setContactStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [contactMessage, setContactMessage] = useState("");
   const scroll = useSmoothScroll();
   const horizontalRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
@@ -665,41 +896,9 @@ function HomeContent() {
     setMenuOpen(false);
   };
 
-  const handleContactSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-
-    setContactStatus("sending");
-    setContactMessage("");
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name: formData.get("name"),
-          email: formData.get("email"),
-          message: formData.get("message")
-        })
-      });
-
-      const result = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(result.error || "Could not send message.");
-      }
-
-      form.reset();
-      setContactStatus("sent");
-      setContactMessage("Message sent. I will reply soon.");
-    } catch (error) {
-      setContactStatus("error");
-      setContactMessage(error instanceof Error ? error.message : "Could not send message.");
-    }
-  };
+  const handleScrollToTop = useCallback(() => {
+    scroll?.scrollTo("#top");
+  }, [scroll]);
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -802,50 +1001,39 @@ function HomeContent() {
         </AnimatePresence>
       </header>
 
+      {/* ═══════ HERO SECTION ═══════ */}
       <section
         ref={heroRef}
         id="top"
         className="relative z-10 mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-4 pb-16 pt-28 lg:grid-cols-[0.9fr_1.1fr]"
       >
+        <HeroParticles />
         <div>
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65 }}
-            className="mb-5 inline-flex items-center gap-2 rounded-md border border-cyan-200/20 bg-cyan-200/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100"
+            className="mb-5 flex flex-wrap items-center gap-3"
           >
-            <Zap size={14} />
-            Bhopal-based builder
+            <span className="inline-flex items-center gap-2 rounded-md border border-cyan-200/20 bg-cyan-200/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100">
+              <Zap size={14} />
+              Bhopal-based builder
+            </span>
+            {/* Available for work badge */}
+            <span className="inline-flex items-center gap-2 rounded-md border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-semibold text-emerald-200">
+              <span className="pulse-glow h-2 w-2 rounded-full bg-emerald-400" />
+              Available for work
+            </span>
           </motion.div>
           <div className="overflow-hidden">
-            <motion.h1
-              initial={{ y: 120 }}
-              animate={{ y: 0 }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              className="text-balance text-5xl font-semibold leading-[1.02] text-white sm:text-6xl lg:text-7xl"
-            >
-              Kapil Kurchaniya
-            </motion.h1>
+            <h1 data-cursor="text" className="text-balance text-5xl font-semibold leading-[1.02] text-white sm:text-6xl lg:text-7xl">
+              <TextReveal text="Kapil Kurchaniya" mode="char" delay={0.1} />
+            </h1>
           </div>
-          <motion.div
-            initial="hidden"
-            animate="show"
-            variants={{
-              hidden: {},
-              show: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } }
-            }}
-            className="mt-4 flex flex-wrap gap-2"
-          >
-            {["Full Stack Developer", "Creative Frontend Engineer", "AI Builder"].map((label) => (
-              <motion.span
-                key={label}
-                variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
-                className="rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-semibold text-slate-200"
-              >
-                {label}
-              </motion.span>
-            ))}
-          </motion.div>
+
+          {/* Animated role ticker */}
+          <RoleTicker />
+
           <motion.p
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
@@ -887,6 +1075,7 @@ function HomeContent() {
         </a>
       </section>
 
+      {/* ═══════ PROJECTS SECTION ═══════ */}
       <section ref={horizontalRef} id="projects" className="relative z-10 px-4 py-20 md:min-h-screen">
         <div className="mx-auto max-w-6xl">
           <SectionHeading
@@ -943,6 +1132,7 @@ function HomeContent() {
         </div>
       </section>
 
+      {/* ═══════ LIVE LINKS SECTION ═══════ */}
       <section id="live" className="relative z-10 px-4 py-20">
         <div className="mx-auto max-w-6xl">
           <SectionHeading
@@ -953,34 +1143,14 @@ function HomeContent() {
           <StaggerReveal className="grid gap-5 md:grid-cols-2" stagger={0.08}>
             {liveProjects.map((project) => (
               <StaggerItem key={project.name}>
-                <motion.a
-                  href={project.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  whileHover={{ y: -8, scale: 1.01 }}
-                  whileTap={{ scale: 0.985 }}
-                  className="glass group block overflow-hidden rounded-lg transition hover:border-cyan-200/40"
-                >
-                  <div className="relative aspect-[16/9] overflow-hidden bg-slate-950/70">
-                    <Image src={project.preview} alt={`${project.name} live preview`} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover object-top transition duration-700 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-100">{project.type}</p>
-                        <h3 className="mt-1 text-2xl font-semibold text-white">{project.name}</h3>
-                      </div>
-                      <span className="grid size-11 place-items-center rounded-md bg-cyan-300 text-slate-950 shadow-glow">
-                        <ArrowUpRight size={18} />
-                      </span>
-                    </div>
-                  </div>
-                </motion.a>
+                <LiveProjectCard project={project} />
               </StaggerItem>
             ))}
           </StaggerReveal>
         </div>
       </section>
 
+      {/* ═══════ STACK SECTION ═══════ */}
       <section id="stack" className="relative z-10 px-4 py-20">
         <div className="mx-auto max-w-6xl">
           <SectionHeading
@@ -1023,6 +1193,7 @@ function HomeContent() {
         </div>
       </section>
 
+      {/* ═══════ EXPERIENCE SECTION ═══════ */}
       <section id="experience" className="relative z-10 px-4 py-20">
         <div className="mx-auto max-w-5xl">
           <SectionHeading
@@ -1056,49 +1227,41 @@ function HomeContent() {
         </div>
       </section>
 
+      {/* ═══════ STATS SECTION ═══════ */}
       <section id="stats" className="relative z-10 px-4 py-20">
         <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[0.85fr_1.15fr]">
-          <Reveal>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">GitHub + LeetCode</p>
-            <h2 className="text-balance text-3xl font-semibold text-white sm:text-5xl">Signals for consistency, curiosity, and problem solving.</h2>
-            <p className="mt-4 text-base leading-7 text-slate-300">
-              The portfolio links directly to GitHub and frames LeetCode as a strength in time complexity, space optimization, and advanced data structures.
-            </p>
-              <StaggerReveal className="mt-6 flex flex-wrap gap-3" delay={0.12} stagger={0.08}>
-                <StaggerItem>
-                <GlowButton href="https://github.com/kapilkurchaniya" variant="secondary">
-                  GitHub <Github size={17} />
-                </GlowButton>
-                </StaggerItem>
-                <StaggerItem>
-                <GlowButton href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" variant="secondary">
-                  LinkedIn <Linkedin size={17} />
-                </GlowButton>
-                </StaggerItem>
-              </StaggerReveal>
-          </Reveal>
+          <div>
+            <Reveal>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">GitHub + LeetCode</p>
+              <h2 className="text-balance text-3xl font-semibold text-white sm:text-5xl">Signals for consistency, curiosity, and problem solving.</h2>
+              <p className="mt-4 text-base leading-7 text-slate-300">
+                The portfolio links directly to GitHub and frames LeetCode as a strength in time complexity, space optimization, and advanced data structures.
+              </p>
+                <StaggerReveal className="mt-6 flex flex-wrap gap-3" delay={0.12} stagger={0.08}>
+                  <StaggerItem>
+                  <GlowButton href="https://github.com/kapilkurchaniya" variant="secondary">
+                    GitHub <Github size={17} />
+                  </GlowButton>
+                  </StaggerItem>
+                  <StaggerItem>
+                  <GlowButton href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" variant="secondary">
+                    LinkedIn <Linkedin size={17} />
+                  </GlowButton>
+                  </StaggerItem>
+                </StaggerReveal>
+            </Reveal>
+            <GitHubHeatmap />
+          </div>
           <Reveal delay={0.12}>
             <div className="glass rounded-lg p-5">
-              <StaggerReveal className="grid gap-3 sm:grid-cols-2" stagger={0.07}>
-                {[
-                  ["Stacks + queues", "Core DSA"],
-                  ["BST + OOP", "Problem models"],
-                  ["Time complexity", "Optimization"],
-                  ["Space complexity", "Competitive programming"]
-                ].map(([title, label]) => (
-                  <StaggerItem key={title}>
-                  <motion.div whileHover={{ y: -5, scale: 1.015 }} className="rounded-md border border-white/10 bg-white/[0.04] p-4">
-                    <p className="text-lg font-semibold text-white">{title}</p>
-                    <p className="mt-2 text-sm text-slate-400">{label}</p>
-                  </motion.div>
-                  </StaggerItem>
-                ))}
-              </StaggerReveal>
+              <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Core DSA competence</p>
+              <SkillOrbit />
             </div>
           </Reveal>
         </div>
       </section>
 
+      {/* ═══════ CONTACT SECTION ═══════ */}
       <section id="contact" className="relative z-10 px-4 pb-24 pt-16">
         <Reveal>
           <div className="glass mx-auto grid max-w-5xl gap-8 rounded-lg p-6 sm:p-10 lg:grid-cols-[0.9fr_1.1fr]">
@@ -1123,66 +1286,13 @@ function HomeContent() {
                 </GlowButton>
               </div>
             </div>
-            <motion.form
-              className="space-y-4"
-              onSubmit={handleContactSubmit}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-80px" }}
-              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
-            >
-              {[
-                ["name", "Your name"],
-                ["email", "Email address"],
-                ["message", "Project idea"]
-              ].map(([name, placeholder]) =>
-                name === "message" ? (
-                  <motion.textarea
-                    key={name}
-                    name={name}
-                    placeholder={placeholder}
-                    rows={5}
-                    variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
-                    whileFocus={{ scale: 1.01 }}
-                    className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-200/60 focus:bg-cyan-200/5"
-                  />
-                ) : (
-                  <motion.input
-                    key={name}
-                    name={name}
-                    placeholder={placeholder}
-                    variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
-                    whileFocus={{ scale: 1.01 }}
-                    className="h-12 w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-200/60 focus:bg-cyan-200/5"
-                  />
-                )
-              )}
-              <motion.button
-                disabled={contactStatus === "sending"}
-                variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }}
-                whileHover={{ y: -3 }}
-                whileTap={{ scale: 0.97 }}
-                className="inline-flex min-h-12 items-center gap-2 rounded-md bg-cyan-300 px-5 text-sm font-semibold text-slate-950 shadow-glow transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {contactStatus === "sending" ? "Sending..." : "Send signal"} <Send size={17} />
-              </motion.button>
-              <AnimatePresence mode="wait">
-                {contactMessage && (
-                  <motion.p
-                    key={contactMessage}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    className={`text-sm ${contactStatus === "sent" ? "text-emerald-200" : "text-rose-200"}`}
-                  >
-                    {contactMessage}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </motion.form>
+            <ContactForm />
           </div>
         </Reveal>
       </section>
+
+      {/* ═══════ FOOTER ═══════ */}
+      <Footer onScrollToTop={handleScrollToTop} />
     </main>
   );
 }
