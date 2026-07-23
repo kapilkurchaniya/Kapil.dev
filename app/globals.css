@@ -352,3 +352,25 @@ html {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ───────── Hover stroke effect for large text ───────── */
+.text-stroke-hover {
+  -webkit-text-stroke: 1px transparent;
+  transition: color 0.4s ease, -webkit-text-stroke 0.4s ease;
+}
+
+.text-stroke-hover:hover,
+.group:hover .text-stroke-hover {
+  color: transparent !important;
+  -webkit-text-stroke: 2px rgba(103, 232, 249, 0.9);
+}
+
+:root[data-theme="light"] .text-stroke-hover:hover,
+:root[data-theme="light"] .group:hover .text-stroke-hover {
+  -webkit-text-stroke: 2px rgba(8, 145, 178, 0.9);
+}
+
+.image-mask-bottom {
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+}
