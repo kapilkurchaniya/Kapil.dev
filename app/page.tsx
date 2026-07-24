@@ -357,8 +357,8 @@ function RoleTicker() {
 /* ───────── ProjectCard with FloatingOverlay + spotlight glow ───────── */
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
-    <Reveal delay={index * 0.08}>
-      <TiltCard className="project-card group h-full min-h-[520px] w-[82vw] max-w-[430px] shrink-0 rounded-lg md:w-[430px]">
+    <Reveal className="w-full shrink-0" delay={index * 0.08}>
+      <TiltCard className="project-card group h-full w-[88%] shrink-0 rounded-lg sm:w-[72%] md:w-[48%] lg:w-[42%]">
         <FloatingOverlay>
           <motion.div
             whileTap={{ scale: 0.985 }}
@@ -384,7 +384,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                 src={project.preview}
                 alt={`${project.name} project preview`}
                 fill
-                sizes="(max-width: 768px) 82vw, 430px"
+                sizes="(max-width: 640px) 88vw, (max-width: 1024px) 44vw, 31vw"
                 className="object-cover object-top transition duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/10 to-transparent" />
@@ -572,7 +572,7 @@ function HeroShowcase() {
   }, []);
 
   return (
-    <div className="hero-showcase relative min-h-[560px]">
+    <div className="hero-showcase relative">
       <div className="absolute -inset-6 rounded-full bg-cyan-300/10 blur-3xl" />
       <motion.div
         aria-hidden="true"
@@ -639,7 +639,7 @@ function HeroShowcase() {
               Live product signal
             </span>
             <span className="rounded-md border border-white/10 bg-white/[0.05] px-3 py-1 text-xs font-semibold text-slate-200">
-              0{activeProject + 1} / 04
+              0{activeProject + 1} / {projects.length < 10 ? `0${projects.length}` : projects.length}
             </span>
           </div>
 
@@ -718,11 +718,11 @@ function SkillOrbit() {
   ];
 
   return (
-    <div className="relative mx-auto flex aspect-square max-w-[320px] items-center justify-center">
+    <div className="relative mx-auto flex aspect-square w-[88%] items-center justify-center sm:w-[72%] lg:w-[64%]">
       {/* Outer orbit ring */}
-      <div className="orbit-ring absolute h-[260px] w-[260px] rounded-full border border-white/10" />
+      <div className="orbit-ring absolute h-[82%] w-[82%] rounded-full border border-white/10" />
       {/* Inner orbit ring */}
-      <div className="orbit-ring absolute h-[180px] w-[180px] rounded-full border border-white/[0.06]" style={{ animationDelay: "2s" }} />
+      <div className="orbit-ring absolute h-[57%] w-[57%] rounded-full border border-white/[0.06]" style={{ animationDelay: "2s" }} />
 
       {/* Center node */}
       <div className="relative z-10 flex flex-col items-center gap-1 rounded-xl border border-cyan-200/30 bg-cyan-200/10 px-5 py-4 text-center shadow-glow backdrop-blur-sm">
@@ -736,7 +736,7 @@ function SkillOrbit() {
           key={topic.label}
           className="orbit-item absolute"
           style={{
-            "--orbit-radius": "120px",
+            "--orbit-radius": "38vw",
             "--orbit-duration": `${16 + i * 3}s`,
             animationDelay: `${i * -4}s`,
             animationDirection: i % 2 === 0 ? "normal" : "reverse",
@@ -909,7 +909,7 @@ function HomeContent() {
       </AnimatePresence>
 
       <ScrollProgress />
-      <div className="ambient-grid grid-mask pointer-events-none fixed inset-x-0 top-0 h-[760px]" />
+      <div className="ambient-grid grid-mask pointer-events-none fixed inset-x-0 top-0 h-[82vh]" />
       <div className="noise-layer pointer-events-none fixed inset-0 z-0 opacity-[0.055]" />
 
       <header className="fixed left-0 right-0 top-4 z-40 px-4">
@@ -1005,66 +1005,84 @@ function HomeContent() {
       <section
         ref={heroRef}
         id="top"
-        className="relative z-10 mx-auto grid min-h-screen max-w-6xl items-center gap-10 px-4 pb-16 pt-28 lg:grid-cols-[0.9fr_1.1fr]"
+        className="relative z-20 mx-auto flex min-h-screen max-w-6xl flex-col gap-16 px-4 pb-48 pt-32 lg:pt-40 lg:pb-72"
       >
         <HeroParticles />
-        <div>
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65 }}
-            className="mb-5 flex flex-wrap items-center gap-3"
+
+        <div className="relative z-10 flex flex-col items-center justify-between gap-10 lg:flex-row lg:items-start">
+          <div className="w-full lg:w-[56%]">
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65 }}
+              className="mb-5 flex flex-wrap items-center gap-3"
+            >
+              <span className="inline-flex items-center gap-2 rounded-md border border-cyan-200/20 bg-cyan-200/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100">
+                <Zap size={14} />
+                Bhopal-based builder
+              </span>
+              {/* Available for work badge */}
+              <span className="inline-flex items-center gap-2 rounded-md border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-semibold text-emerald-200">
+                <span className="pulse-glow h-2 w-2 rounded-full bg-emerald-400" />
+                Available for work
+              </span>
+            </motion.div>
+            
+            <div className="overflow-visible group relative">
+              <h1 data-cursor="text" className="text-balance text-[clamp(3rem,14vw,5.5rem)] font-semibold leading-[1.05] tracking-tight text-white">
+                <span className="block text-stroke-hover"><TextReveal text="Kapil" mode="char" delay={0.1} /></span>
+                <span className="block text-stroke-hover"><TextReveal text="Kurchaniya" mode="char" delay={0.3} /></span>
+              </h1>
+            </div>
+
+            {/* Animated role ticker */}
+            <RoleTicker />
+
+            <motion.p
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.32 }}
+              className="mt-6 max-w-2xl text-lg leading-8 text-slate-300"
+            >
+              Building immersive digital experiences with AI, 3D, and modern frontend engineering.
+            </motion.p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <GlowButton href="#projects" onClick={(event) => scrollToSection(event, "#projects")}>
+                Explore work <ArrowUpRight size={17} />
+              </GlowButton>
+              <GlowButton href="mailto:kapilkurchaniya98@gmail.com" variant="secondary">
+                Contact <Mail size={17} />
+              </GlowButton>
+            </div>
+            <StaggerReveal className="mt-8 flex flex-wrap gap-3 text-sm text-slate-300" delay={0.42} stagger={0.09}>
+              <StaggerItem>
+              <motion.span whileHover={{ y: -3 }} className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
+                <MapPin size={16} className="text-cyan-200" /> Bhopal, India
+              </motion.span>
+              </StaggerItem>
+              <StaggerItem>
+              <motion.span whileHover={{ y: -3 }} className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
+                <Rocket size={16} className="text-violet-200" /> MERN + AI apps
+              </motion.span>
+              </StaggerItem>
+            </StaggerReveal>
+          </div>
+
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="relative w-[88%] sm:w-[72%] lg:w-[38%]"
           >
-            <span className="inline-flex items-center gap-2 rounded-md border border-cyan-200/20 bg-cyan-200/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100">
-              <Zap size={14} />
-              Bhopal-based builder
-            </span>
-            {/* Available for work badge */}
-            <span className="inline-flex items-center gap-2 rounded-md border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-semibold text-emerald-200">
-              <span className="pulse-glow h-2 w-2 rounded-full bg-emerald-400" />
-              Available for work
-            </span>
+            <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden glass border border-white/10 group-hover:border-cyan-200/50 transition duration-500">
+              <Image src="/profile.png" fill sizes="(max-width: 640px) 88vw, (max-width: 1024px) 72vw, 38vw" alt="Kapil Portrait" className="h-auto w-full object-cover image-mask-bottom transition duration-700 hover:scale-105" priority />
+            </div>
           </motion.div>
-          <div className="overflow-hidden">
-            <h1 data-cursor="text" className="text-balance text-5xl font-semibold leading-[1.02] text-white sm:text-6xl lg:text-7xl">
-              <TextReveal text="Kapil Kurchaniya" mode="char" delay={0.1} />
-            </h1>
-          </div>
-
-          {/* Animated role ticker */}
-          <RoleTicker />
-
-          <motion.p
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.32 }}
-            className="mt-6 max-w-2xl text-lg leading-8 text-slate-300"
-          >
-            Building immersive digital experiences with AI, 3D, and modern frontend engineering.
-          </motion.p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <GlowButton href="#projects" onClick={(event) => scrollToSection(event, "#projects")}>
-              Explore work <ArrowUpRight size={17} />
-            </GlowButton>
-            <GlowButton href="mailto:kapilkurchaniya98@gmail.com" variant="secondary">
-              Contact <Mail size={17} />
-            </GlowButton>
-          </div>
-          <StaggerReveal className="mt-8 flex flex-wrap gap-3 text-sm text-slate-300" delay={0.42} stagger={0.09}>
-            <StaggerItem>
-            <motion.span whileHover={{ y: -3 }} className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-              <MapPin size={16} className="text-cyan-200" /> Bhopal, India
-            </motion.span>
-            </StaggerItem>
-            <StaggerItem>
-            <motion.span whileHover={{ y: -3 }} className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2">
-              <Rocket size={16} className="text-violet-200" /> MERN + AI apps
-            </motion.span>
-            </StaggerItem>
-          </StaggerReveal>
         </div>
 
-        <HeroShowcase />
+        <div className="w-full z-10 relative">
+          <HeroShowcase />
+        </div>
 
         <a
           href="#projects"
@@ -1084,7 +1102,7 @@ function HomeContent() {
             copy="Each project is framed around user value, visual proof, and the stack decisions behind the shipped experience."
           />
         </div>
-        <div className="project-track mx-auto flex max-w-full gap-5 overflow-x-auto pb-6 md:w-max md:max-w-none md:overflow-visible">
+        <div className="project-track mx-auto flex w-full max-w-full gap-5 overflow-x-auto pb-6 md:overflow-visible">
           {projects.map((project, index) => (
             <ProjectCard key={project.name} project={project} index={index} />
           ))}
