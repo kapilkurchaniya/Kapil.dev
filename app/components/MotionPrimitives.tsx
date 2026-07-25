@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, useMotionTemplate, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useInView, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { ReactNode, useEffect, useRef, useState } from "react";
 
 const softSpring = {
@@ -203,5 +203,73 @@ export function TiltCard({
       />
       {children}
     </motion.div>
+  );
+}
+
+/* ---------- NEW: ParallaxLayer ---------- */
+export function ParallaxLayer({
+  children,
+  className = "",
+  speed = 0.15,
+}: {
+  children: ReactNode;
+  className?: string;
+  speed?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], [speed * -120, speed * 120]);
+
+  return (
+    <motion.div ref={ref} style={{ y }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
+
+/* ---------- NEW: FloatingOverlay ---------- */
+export function FloatingOverlay({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const overlayX = useMotionValue(0);
+  const overlayY = useMotionValue(0);
+  const springX = useSpring(overlayX, { stiffness: 260, damping: 24 });
+  const springY = useSpring(overlayY, { stiffness: 260, damping: 24 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      ref={ref}
+      className={`relative ${className}`}
+      onMouseMove={(event) => {
+        const bounds = ref.current?.getBoundingClientRect();
+        if (!bounds) return;
+        overlayX.set(event.clientX - bounds.left);
+        overlayY.set(event.clientY - bounds.top);
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {children}
+      <motion.div
+        className="pointer-events-none absolute z-20 flex items-center gap-1.5 rounded-full border border-cyan-200/50 bg-slate-950/75 px-4 py-2 text-xs font-semibold text-cyan-100 shadow-lg backdrop-blur-md"
+        style={{ left: springX, top: springY, x: "-50%", y: "-50%" }}
+        animate={{
+          opacity: isHovered ? 1 : 0,
+          scale: isHovered ? 1 : 0.7,
+        }}
+        transition={{ duration: 0.2 }}
+      >
+        View Project <span className="text-cyan-300">→</span>
+      </motion.div>
+    </div>
   );
 }
