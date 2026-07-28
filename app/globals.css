@@ -374,3 +374,231 @@ html {
   -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   CINEMATIC INTRO — Apple Keynote-style title animation
+   GSAP-powered · Crossfade morph · Character stagger finale
+   Colors: #050713 base · cyan-300 accent · violet ambient
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Fullscreen container ── */
+.ci-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(139, 92, 246, 0.07), transparent 55%),
+    radial-gradient(ellipse at 50% 62%, rgba(34, 211, 238, 0.05), transparent 45%),
+    #050713;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+/* ── Camera wrapper (GSAP scales this for push-in) ── */
+.ci-camera {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+/* ── Cyan dot ── */
+.ci-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: rgb(103, 232, 249);
+  box-shadow:
+    0 0 30px 8px rgba(103, 232, 249, 0.2),
+    0 0 60px 20px rgba(103, 232, 249, 0.08);
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* ── Language title groups — stacked absolutely ── */
+.ci-title,
+.ci-finale {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ── Language label (small, above title) ── */
+.ci-label {
+  font-family: var(--font-inter), -apple-system, "SF Pro Display",
+    "Helvetica Neue", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(103, 232, 249, 0.45);
+  margin: 0;
+  will-change: opacity, transform;
+}
+
+/* ── Text wrapper (clips the sweep effect) ── */
+.ci-text-wrap {
+  position: relative;
+  overflow: hidden;
+  padding: 4px 12px;
+}
+
+/* ── Main title text ── */
+.ci-text {
+  font-family: var(--font-inter), -apple-system, "SF Pro Display",
+    "Helvetica Neue", system-ui, sans-serif;
+  font-size: clamp(1.8rem, 4.8vw, 3.6rem);
+  font-weight: 200;
+  letter-spacing: 0.06em;
+  color: #f8fbff;
+  margin: 0;
+  white-space: nowrap;
+  text-shadow:
+    0 0 40px rgba(103, 232, 249, 0.1),
+    0 0 80px rgba(139, 92, 246, 0.05);
+  will-change: transform, opacity, filter;
+}
+
+/* ── Light sweep — glides across text ── */
+.ci-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 35%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(103, 232, 249, 0.04) 25%,
+    rgba(103, 232, 249, 0.1) 50%,
+    rgba(103, 232, 249, 0.04) 75%,
+    transparent 100%
+  );
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ── Finale text ── */
+.ci-finale-text {
+  font-family: var(--font-inter), -apple-system, "SF Pro Display",
+    "Helvetica Neue", system-ui, sans-serif;
+  font-size: clamp(2rem, 5.5vw, 4.2rem);
+  font-weight: 300;
+  letter-spacing: 0.16em;
+  color: #f8fbff;
+  margin: 0;
+  white-space: nowrap;
+  text-shadow:
+    0 0 50px rgba(103, 232, 249, 0.14),
+    0 0 100px rgba(139, 92, 246, 0.07);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Finale character spans ── */
+.ci-fchar {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* ── Finale ambient glow ── */
+.ci-finale-glow {
+  position: absolute;
+  width: 420px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(103, 232, 249, 0.08) 0%,
+    rgba(139, 92, 246, 0.04) 30%,
+    rgba(34, 211, 238, 0.02) 55%,
+    transparent 75%
+  );
+  pointer-events: none;
+  filter: blur(40px);
+  will-change: transform, opacity;
+}
+
+/* ── Skip button ── */
+.ci-skip {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  font-family: var(--font-inter), -apple-system, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(103, 232, 249, 0.3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: color 0.3s ease, background 0.3s ease;
+  z-index: 10;
+  opacity: 0;
+  animation: ci-skip-reveal 0.5s 2s forwards;
+  pointer-events: auto;
+}
+
+.ci-skip:hover {
+  color: rgba(103, 232, 249, 0.65);
+  background: rgba(103, 232, 249, 0.05);
+}
+
+@keyframes ci-skip-reveal {
+  to {
+    opacity: 0.4;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .ci-text {
+    font-size: clamp(1.2rem, 7vw, 2rem);
+    letter-spacing: 0.03em;
+  }
+
+  .ci-finale-text {
+    font-size: clamp(1.3rem, 8vw, 2.4rem);
+    letter-spacing: 0.1em;
+  }
+
+  .ci-label {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+  }
+
+  .ci-skip {
+    bottom: 24px;
+    right: 24px;
+    font-size: 11px;
+  }
+
+  .ci-finale-glow {
+    width: 240px;
+    height: 100px;
+  }
+
+  .ci-title,
+  .ci-finale {
+    gap: 10px;
+  }
+}
+

@@ -37,6 +37,7 @@ import { TextReveal } from "./components/TextReveal";
 import { SmoothScrollProvider, useSmoothScroll } from "./components/SmoothScroll";
 import { ContactForm } from "./components/ContactForm";
 import { Footer } from "./components/Footer";
+import { CinematicIntro } from "./components/CinematicIntro";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -220,30 +221,7 @@ function HeroParticles() {
   );
 }
 
-/* ───────── Preloader ───────── */
-function PortfolioPreloader({ onComplete }: { onComplete: () => void }) {
-  useEffect(() => {
-    const timer = window.setTimeout(onComplete, 850);
-    return () => window.clearTimeout(timer);
-  }, [onComplete]);
-
-  return (
-    <motion.div
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="fixed inset-0 z-[80] grid place-items-center bg-[var(--loader-bg)] backdrop-blur-2xl"
-    >
-      <div className="text-center">
-        <div className="mx-auto mb-5 grid size-16 place-items-center rounded-lg border border-cyan-200/25 bg-cyan-200/10 shadow-glow">
-          <Loader2 className="animate-spin text-cyan-200" size={30} />
-        </div>
-        <p className="text-sm font-semibold uppercase tracking-[0.32em] text-cyan-100">Initializing portfolio</p>
-        <p className="mt-3 text-sm text-slate-300">Smooth scroll and cinematic transitions are ready.</p>
-      </div>
-    </motion.div>
-  );
-}
+/* ───────── Preloader (replaced by CinematicIntro) ───────── */
 
 /* ───────── Animated stat value ───────── */
 function AnimatedStatValue({ value }: { value: string }) {
@@ -339,7 +317,7 @@ function RoleTicker() {
         <motion.div
           key={roles[activeRole]}
           initial={{ y: 32, opacity: 0, filter: "blur(6px)" }}
-          animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+          animate={{ y: 0, opacity: 1, filter: "blur(0.01px)" }}
           exit={{ y: -32, opacity: 0, filter: "blur(6px)" }}
           transition={{ duration: 0.45, ease: smoothEase }}
           className="flex items-center gap-3"
@@ -357,8 +335,8 @@ function RoleTicker() {
 /* ───────── ProjectCard with FloatingOverlay + spotlight glow ───────── */
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
-    <Reveal className="w-full shrink-0" delay={index * 0.08}>
-      <TiltCard className="project-card group h-full w-[88%] shrink-0 rounded-lg sm:w-[72%] md:w-[48%] lg:w-[42%]">
+    <Reveal className="w-[88vw] max-w-[420px] sm:w-[380px] md:w-[440px] lg:w-[460px] shrink-0 snap-center" delay={index * 0.08}>
+      <TiltCard className="project-card group h-full w-full rounded-lg">
         <FloatingOverlay>
           <motion.div
             whileTap={{ scale: 0.985 }}
@@ -548,7 +526,7 @@ function AIAssistant() {
       <motion.div
         key={active}
         initial={{ opacity: 0, y: 12, filter: "blur(8px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0.01px)" }}
         transition={{ duration: 0.38, ease: smoothEase }}
         className="mt-4 rounded-md border border-white/10 bg-slate-950/60 p-3 text-sm leading-6 text-slate-200"
       >
@@ -617,7 +595,7 @@ function HeroShowcase() {
             <motion.div
               key={project.name}
               initial={{ opacity: 0, scale: 1.04, x: 28, filter: "blur(10px)" }}
-              animate={{ opacity: 1, scale: 1, x: 0, filter: "blur(0px)" }}
+              animate={{ opacity: 1, scale: 1, x: 0, filter: "blur(0.01px)" }}
               exit={{ opacity: 0, scale: 0.98, x: -28, filter: "blur(8px)" }}
               transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
               className="absolute inset-0"
@@ -904,7 +882,7 @@ function HomeContent() {
     <main className="relative min-h-screen overflow-hidden">
       <AnimatePresence>
         {booting && (
-          <PortfolioPreloader onComplete={() => setBooting(false)} />
+          <CinematicIntro onComplete={() => setBooting(false)} />
         )}
       </AnimatePresence>
 
@@ -1070,7 +1048,7 @@ function HomeContent() {
 
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            animate={{ opacity: 1, scale: 1, filter: "blur(0.01px)" }}
             transition={{ duration: 0.7, delay: 0.2 }}
             className="relative w-[88%] sm:w-[72%] lg:w-[38%]"
           >
@@ -1094,15 +1072,15 @@ function HomeContent() {
       </section>
 
       {/* ═══════ PROJECTS SECTION ═══════ */}
-      <section ref={horizontalRef} id="projects" className="relative z-10 px-4 py-20 md:min-h-screen">
-        <div className="mx-auto max-w-6xl">
+      <section ref={horizontalRef} id="projects" className="relative z-10 overflow-hidden py-20 md:min-h-screen flex flex-col justify-center">
+        <div className="mx-auto max-w-6xl px-4">
           <SectionHeading
             eyebrow="Featured projects"
             title="Cinematic product cards built for depth and motion."
             copy="Each project is framed around user value, visual proof, and the stack decisions behind the shipped experience."
           />
         </div>
-        <div className="project-track mx-auto flex w-full max-w-full gap-5 overflow-x-auto pb-6 md:overflow-visible">
+        <div className="project-track mx-auto flex w-full max-w-full gap-6 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory lg:overflow-visible lg:w-max px-4 lg:px-12">
           {projects.map((project, index) => (
             <ProjectCard key={project.name} project={project} index={index} />
           ))}
