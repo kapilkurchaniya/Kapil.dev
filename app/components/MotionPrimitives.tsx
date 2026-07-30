@@ -21,10 +21,10 @@ export function Reveal({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 34, filter: "blur(10px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-90px" }}
-      transition={{ duration: 0.72, delay, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0.01px)" }}
+      viewport={{ once: true, margin: "-20px" }}
+      transition={{ duration: 0.42, delay, ease: [0.22, 1, 0.36, 1] }}
       className={`relative ${className}`}
     >
       {children}
@@ -47,7 +47,7 @@ export function StaggerReveal({
     <motion.div
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, margin: "-80px" }}
+      viewport={{ once: true, margin: "-20px" }}
       variants={{
         hidden: {},
         show: {
@@ -74,10 +74,10 @@ export function StaggerItem({
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 28, scale: 0.96, filter: "blur(10px)" },
-        show: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
+        hidden: { opacity: 0, y: 16, scale: 0.98, filter: "blur(4px)" },
+        show: { opacity: 1, y: 0, scale: 1, filter: "blur(0.01px)" }
       }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className={`relative ${className}`}
     >
       {children}

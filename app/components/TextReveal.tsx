@@ -37,9 +37,10 @@ export function TextReveal({ text, className = "", delay = 0, mode = "word" }: T
       rotateX: 0,
       filter: "blur(0px)",
       transition: {
-        type: "spring",
-        damping: mode === "char" ? 22 : 18,
-        stiffness: mode === "char" ? 200 : 150,
+        y: { type: "spring", damping: mode === "char" ? 22 : 18, stiffness: mode === "char" ? 200 : 150 },
+        rotateX: { type: "spring", damping: mode === "char" ? 22 : 18, stiffness: mode === "char" ? 200 : 150 },
+        opacity: { duration: 0.4, ease: "easeOut" },
+        filter: { duration: 0.4, ease: "easeOut" },
       },
     },
     hidden: {

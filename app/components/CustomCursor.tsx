@@ -140,7 +140,7 @@ export function CustomCursor() {
           {variant === "project" && (
             <motion.span
               initial={{ opacity: 0, scale: 0.6, filter: "blur(6px)" }}
-              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0.01px)" }}
               exit={{ opacity: 0, scale: 0.6, filter: "blur(6px)" }}
               transition={{ duration: 0.2 }}
               className="absolute text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-100"
