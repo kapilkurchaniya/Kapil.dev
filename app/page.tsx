@@ -41,7 +41,7 @@ import { CinematicIntro } from "./components/CinematicIntro";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const navItems = ["Projects", "Live", "Stack", "Experience", "Stats", "Contact"];
+const navItems = ["Projects", "Stack", "Experience", "Stats", "Contact"];
 
 type Project = {
   name: string;
@@ -129,15 +129,12 @@ const projects: Project[] = [
   }
 ];
 
-const liveProjects = projects.filter((project): project is Project & { href: string } => Boolean(project.href));
-
 const moreProjects = [
   {
     name: "Spotlight Effect 2",
     summary: "A visually stunning spotlight effect highlighting elements with fluid motion and interaction.",
     stack: ["React", "TypeScript", "Tailwind CSS"],
     href: "https://spotlight-effect2.vercel.app/",
-    github: "https://github.com/kapilkurchaniya/Spotlight-Effect2",
   }
 ];
 
@@ -383,18 +380,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                   <h3 className="mt-2 text-2xl font-semibold text-white">{project.name}</h3>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  {project.github && (
-                    <motion.a
-                      href={project.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`${project.name} GitHub repository`}
-                      whileHover={{ y: -3 }}
-                      className="grid size-10 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-slate-300 transition hover:border-white/25 hover:text-white"
-                    >
-                      <Github size={18} />
-                    </motion.a>
-                  )}
                   {project.href && (
                     <motion.a
                       href={project.href}
@@ -428,48 +413,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 }
 
 /* ───────── Live project card with scroll-through hover ───────── */
-function LiveProjectCard({ project }: { project: Project & { href: string } }) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.a
-      href={project.href}
-      target="_blank"
-      rel="noreferrer"
-      whileHover={{ y: -8, scale: 1.01 }}
-      whileTap={{ scale: 0.985 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="glass group block overflow-hidden rounded-lg transition hover:border-cyan-200/40"
-    >
-      <div className="relative aspect-[16/9] overflow-hidden bg-slate-950/70">
-        <Image
-          src={project.preview}
-          alt={`${project.name} live preview`}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="transition duration-[3000ms] ease-in-out"
-          style={{
-            objectFit: "cover",
-            objectPosition: isHovered ? "bottom" : "top",
-            transform: isHovered ? "scale(1.05)" : "scale(1)",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-100">{project.type}</p>
-            <h3 className="mt-1 text-2xl font-semibold text-white">{project.name}</h3>
-          </div>
-          <span className="grid size-11 place-items-center rounded-md bg-cyan-300 text-slate-950 shadow-glow">
-            <ArrowUpRight size={18} />
-          </span>
-        </div>
-      </div>
-    </motion.a>
-  );
-}
-
 /* ───────── AI Assistant ───────── */
 function AIAssistant() {
   const prompts = useMemo(
@@ -930,12 +873,6 @@ function HomeContent() {
             >
               {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
             </motion.button>
-            <motion.a whileHover={{ y: -2 }} whileTap={{ scale: 0.94 }} href="https://github.com/kapilkurchaniya" target="_blank" rel="noopener noreferrer" className="grid size-9 place-items-center rounded-md border border-white/10 text-slate-300 hover:text-white" aria-label="GitHub">
-              <Github size={17} />
-            </motion.a>
-            <motion.a whileHover={{ y: -2 }} whileTap={{ scale: 0.94 }} href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" target="_blank" rel="noopener noreferrer" className="grid size-9 place-items-center rounded-md border border-white/10 text-slate-300 hover:text-white" aria-label="LinkedIn">
-              <Linkedin size={17} />
-            </motion.a>
           </div>
           <div className="flex items-center gap-2 md:hidden">
             <motion.button
@@ -1101,11 +1038,6 @@ function HomeContent() {
                         <Code2 size={18} />
                       </span>
                       <div className="flex gap-2">
-                        {project.github && (
-                          <a href={project.github} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition">
-                            <Github size={18} />
-                          </a>
-                        )}
                         <a href={project.href} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-cyan-200 transition">
                           <ArrowUpRight size={18} />
                         </a>
@@ -1125,24 +1057,6 @@ function HomeContent() {
               ))}
             </div>
           </Reveal>
-        </div>
-      </section>
-
-      {/* ═══════ LIVE LINKS SECTION ═══════ */}
-      <section id="live" className="relative z-10 px-4 py-20">
-        <div className="mx-auto max-w-6xl">
-          <SectionHeading
-            eyebrow="Live links"
-            title="Preview the work without slowing the show."
-            copy="Captured previews keep scrolling smooth while every card still opens the real deployed project."
-          />
-          <StaggerReveal className="grid gap-5 md:grid-cols-2" stagger={0.08}>
-            {liveProjects.map((project) => (
-              <StaggerItem key={project.name}>
-                <LiveProjectCard project={project} />
-              </StaggerItem>
-            ))}
-          </StaggerReveal>
         </div>
       </section>
 
@@ -1233,18 +1147,6 @@ function HomeContent() {
               <p className="mt-4 text-base leading-7 text-slate-300">
                 The portfolio links directly to GitHub and frames LeetCode as a strength in time complexity, space optimization, and advanced data structures.
               </p>
-                <StaggerReveal className="mt-6 flex flex-wrap gap-3" delay={0.12} stagger={0.08}>
-                  <StaggerItem>
-                  <GlowButton href="https://github.com/kapilkurchaniya" variant="secondary">
-                    GitHub <Github size={17} />
-                  </GlowButton>
-                  </StaggerItem>
-                  <StaggerItem>
-                  <GlowButton href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" variant="secondary">
-                    LinkedIn <Linkedin size={17} />
-                  </GlowButton>
-                  </StaggerItem>
-                </StaggerReveal>
             </Reveal>
             <GitHubHeatmap />
           </div>
@@ -1270,12 +1172,6 @@ function HomeContent() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <GlowButton href="mailto:kapilkurchaniya98@gmail.com">
                   Email <Mail size={17} />
-                </GlowButton>
-                <GlowButton href="https://github.com/kapilkurchaniya" variant="secondary">
-                  GitHub <Github size={17} />
-                </GlowButton>
-                <GlowButton href="https://www.linkedin.com/in/kapil-kurchaniya-961589353" variant="secondary">
-                  LinkedIn <Linkedin size={17} />
                 </GlowButton>
                 <GlowButton href="/Kapil-Kurchaniya-Resume.pdf" variant="secondary" download>
                   Resume <Download size={17} />
