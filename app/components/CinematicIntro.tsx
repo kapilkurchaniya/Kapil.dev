@@ -296,7 +296,7 @@ export function CinematicIntro({
   const finaleGraphemes = splitGraphemes(FINALE_TEXT);
 
   return (
-    <div ref={containerRef} className="ci-container">
+    <div ref={containerRef} className="ci-container" aria-hidden="true">
       {/* ── Cyan dot ── */}
       <div className="ci-dot" />
 
@@ -307,7 +307,7 @@ export function CinematicIntro({
           <div key={i} className="ci-title">
             <p className="ci-label">{title.lang}</p>
             <div className="ci-text-wrap">
-              <h1 className="ci-text">{title.text}</h1>
+              <p className="ci-text">{title.text}</p>
               <div className="ci-sweep" aria-hidden="true" />
             </div>
           </div>
@@ -315,13 +315,13 @@ export function CinematicIntro({
 
         {/* ── Finale ── */}
         <div className="ci-finale">
-          <h1 className="ci-finale-text">
+          <p className="ci-finale-text">
             {finaleGraphemes.map((char, i) => (
               <span key={i} className="ci-fchar">
                 {char === " " ? "\u00A0" : char}
               </span>
             ))}
-          </h1>
+          </p>
           <div className="ci-finale-glow" aria-hidden="true" />
           <div className="ci-sweep" aria-hidden="true" />
         </div>
