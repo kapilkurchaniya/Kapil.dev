@@ -10,6 +10,7 @@ import {
   Code2,
   Database,
   Download,
+  FileText,
   Github,
   GraduationCap,
   Linkedin,
@@ -38,6 +39,7 @@ import { SmoothScrollProvider, useSmoothScroll } from "./components/SmoothScroll
 import { ContactForm } from "./components/ContactForm";
 import { Footer } from "./components/Footer";
 import { CinematicIntro } from "./components/CinematicIntro";
+import GithubCalendar from "./components/GithubCalendar";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -56,6 +58,38 @@ type Project = {
 };
 
 const projects: Project[] = [
+  {
+    name: "INVEST MADHYA PRADESH 2026",
+    type: "Contribution Project",
+    summary:
+      "A prototype platform developed for the Global Investors Summit Madhya Pradesh 2026. Designed to showcase investment opportunities, facilitate registrations, and connect government leaders with global investors.",
+    stack: ["React", "Next.js", "Tailwind", "TypeScript"],
+    preview: "/previews/invest-mp.png",
+    accent: "from-blue-400 via-indigo-400 to-violet-400",
+    metric: "Government Prototype"
+  },
+  {
+    name: "GOVT. CIVIL HOSPITAL OPD",
+    type: "Software & Freelance Project",
+    summary:
+      "A comprehensive Hospital Management System for Govt. Civil Hospital, Gadarwara. Built to streamline OPD management, digitize patient records, and provide a secure admin portal for hospital staff.",
+    stack: ["React", "TypeScript", "Tailwind", "Node.js"],
+    preview: "/previews/hospital-management.png",
+    accent: "from-teal-300 via-emerald-300 to-blue-400",
+    metric: "Healthcare software"
+  },
+  {
+    name: "GHSS ASHTA",
+    type: "Freelancing Project",
+    summary:
+      "Government Higher Secondary School, Ashta (GHSS Ashta) website. The project provides a public website for students, staff and visitors plus an admin area to manage notices, documents and gallery uploads.",
+    stack: ["Next.js", "TypeScript", "Tailwind", "React"],
+    href: "https://ashta-project.vercel.app/",
+    github: "https://github.com/kapilkurchaniya/ashta-project",
+    preview: "/previews/ashta-project.png",
+    accent: "from-blue-300 via-indigo-300 to-purple-300",
+    metric: "School admin portal"
+  },
   {
     name: "MEDIASSIST AI",
     type: "AI Healthcare Platform",
@@ -129,7 +163,7 @@ const projects: Project[] = [
   }
 ];
 
-const moreProjects = [
+const moreProjects: Array<{name: string; summary: string; stack: string[]; href?: string; github?: string}> = [
   {
     name: "Spotlight Effect 2",
     summary: "A visually stunning spotlight effect highlighting elements with fluid motion and interaction.",
@@ -154,11 +188,20 @@ const skills = [
 
 const timeline = [
   {
+    title: "Full Stack Intern",
+    org: "Anav WebTech Pvt. Ltd.",
+    detail:
+      "Completed a comprehensive 30-day OutSystems training program. Developed skills in Service Development, UI Design, and Business Process Management. Gained hands-on experience with HTML, CSS, JavaScript, React.js, Node.js, Express.js, and MongoDB. Contributed to the integration and security aspects of web applications, enhancing overall functionality.",
+    icon: BriefcaseBusiness,
+    certLink: "/certificates/anav-certificate.jpg"
+  },
+  {
     title: "MERN Stack Intern",
     org: "Cybrom Technology Pvt Ltd",
     detail:
-      "Built responsive React interfaces, reusable UI components, Node/Express integrations, MongoDB CRUD flows, and GitHub-based delivery habits.",
-    icon: BriefcaseBusiness
+      "Developed responsive frontend interfaces using React.js, enhancing user experience and maintainability. Integrated RESTful backend APIs with Node.js and Express.js, facilitating efficient CRUD operations in MongoDB. Collaborated in an agile workflow with Git and GitHub, improving code review and deployment processes.",
+    icon: Code2,
+    certLink: "/certificates/cybrom-certificate.jpg"
   },
   {
     title: "B.Tech Information Technology",
@@ -173,6 +216,128 @@ const timeline = [
     detail:
       "Coordinated event logistics, digital poster generation, technical operations, and marketing.",
     icon: Trophy
+  }
+];
+
+const certifications = [
+  {
+    title: "Data Analytics Job Simulation",
+    issuer: "Deloitte (via Forage)",
+    date: "Jun 29, 2025",
+    description: "Completed practical tasks in Data analysis and Forensic technology.",
+    image: "/certificates/deloitte-data-analytics.png",
+  },
+  {
+    title: "AI Skills Passport",
+    issuer: "EY and Microsoft",
+    date: "2025-2026",
+    description: "Completed the employability sections covering Sustainability, Business, or Technology.",
+    image: "/certificates/ai-skills-passport.jpeg",
+  },
+  {
+    title: "Google Play Store Listing",
+    issuer: "Google Play Academy",
+    date: "Valid till Nov 2028",
+    description: "Successfully completed the Google Play Store Listing Certificate requirements.",
+    image: "/certificates/google-play.jpeg",
+  },
+  {
+    title: "AWS DevOps Engineer",
+    issuer: "AWS Training & Certification",
+    date: "Oct 27, 2025",
+    description: "Domain 1 Review: AWS Certified DevOps Engineer - Professional (DOP-C02).",
+    image: "/certificates/aws-devops.png",
+  },
+  {
+    title: "Getting Started with DevOps on AWS",
+    issuer: "AWS Training & Certification",
+    date: "Jun 06, 2024",
+    description: "Successfully completed the Getting Started with DevOps on AWS course.",
+    image: "/certificates/aws-getting-started-devops.png",
+  },
+  {
+    title: "Gemini Certified Student",
+    issuer: "Google for Education",
+    date: "Valid till Oct 2028",
+    description: "Demonstrated the knowledge, skills, and basic competencies needed to use Google AI.",
+    image: "/certificates/gemini-certified.jpg",
+  },
+  {
+    title: "GA4 Data and Reports",
+    issuer: "Google",
+    date: "2025-2026",
+    description: "Successfully completed the Dive Deeper into GA4 Data and Reports course.",
+    image: "/certificates/ga4-reports.jpeg",
+  },
+  {
+    title: "Introduction to GitHub Copilot",
+    issuer: "Microsoft",
+    date: "Jan 2, 2026",
+    description: "Successfully completed the introduction to GitHub Copilot.",
+    image: "/certificates/github-copilot.jpeg",
+  },
+  {
+    title: "Data Analytics Essentials",
+    issuer: "Cisco Networking Academy",
+    date: "Feb 14, 2026",
+    description: "Successfully completed the Data Analytics Essentials course offered by Cisco.",
+    image: "/certificates/cisco-data-analytics.jpg",
+  },
+  {
+    title: "Cybersecurity Fundamentals",
+    issuer: "Infosys Springboard",
+    date: "Nov 6, 2025",
+    description: "Successfully completed the Cybersecurity Fundamentals course.",
+    image: "/certificates/infosys-cybersecurity.jpeg",
+  },
+  {
+    title: "Microsoft Build Event",
+    issuer: "SCALive x Knowvy Technologies",
+    date: "Jun 20, 2026",
+    description: "Awarded for outstanding participation in the Microsoft Build Event by SCALive and Knowvy Technologies.",
+    image: "/certificates/microsoft-build.jpg",
+  },
+  {
+    title: "AI Day Bhopal 2.0: Build With AI",
+    issuer: "ML Bhopal at LNCT Group",
+    date: "May 16, 2026",
+    description: "Participated in Hands-On Expert Sessions & Workshop organized by ML Bhopal and Google for Developers.",
+    image: "/certificates/ai-day-bhopal.jpg",
+  },
+  {
+    title: "Build With AI",
+    issuer: "SCALive x DevAarambh",
+    date: "Jun 13, 2026",
+    description: "Participated in Build With AI event, demonstrating dedication and enthusiasm for AI Tools.",
+    image: "/certificates/build-with-ai.jpg",
+  },
+  {
+    title: "Docker & Kubernetes",
+    issuer: "Scaler Masterclass",
+    date: "Nov 6, 2025",
+    description: "Upskilled in the Fundamentals of Docker & Kubernetes Masterclass.",
+    image: "/certificates/scaler-docker.jpeg",
+  },
+  {
+    title: "E-Commerce with React",
+    issuer: "Scaler Masterclass",
+    date: "Nov 25, 2025",
+    description: "Upskilled in building an E-Commerce platform using React Masterclass.",
+    image: "/certificates/scaler-react.jpeg",
+  },
+  {
+    title: "Oriental TechHack 2.0 Winner",
+    issuer: "Oriental Institute of Science & Technology",
+    date: "Apr 30, 2026",
+    description: "Overall Category Winner at the National Level Hackathon organized by OIST and Cybrom Technology.",
+    image: "/certificates/oriental-techhack-winner.jpeg",
+  },
+  {
+    title: "Coding Premier League 2026",
+    issuer: "TechArena Club, LNCT Group",
+    date: "Jun 13, 2026",
+    description: "Participated in Season 1 of the Coding Premier League (CPL) 2026.",
+    image: "/certificates/cpl-2026-participant.jpeg",
   }
 ];
 
@@ -380,6 +545,18 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                   <h3 className="mt-2 text-2xl font-semibold text-white">{project.name}</h3>
                 </div>
                 <div className="flex shrink-0 gap-2">
+                  {project.github && (
+                    <motion.a
+                      href={project.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`GitHub repo for ${project.name}`}
+                      whileHover={{ scale: 1.1, rotate: -5 }}
+                      className="grid size-10 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-slate-300 transition group-hover:bg-white/10 group-hover:text-white"
+                    >
+                      <Github size={18} />
+                    </motion.a>
+                  )}
                   {project.href && (
                     <motion.a
                       href={project.href}
@@ -1038,9 +1215,16 @@ function HomeContent() {
                         <Code2 size={18} />
                       </span>
                       <div className="flex gap-2">
-                        <a href={project.href} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-cyan-200 transition">
-                          <ArrowUpRight size={18} />
-                        </a>
+                        {project.github && (
+                          <a href={project.github} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition">
+                            <Github size={18} />
+                          </a>
+                        )}
+                        {project.href && (
+                          <a href={project.href} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-cyan-200 transition">
+                            <ArrowUpRight size={18} />
+                          </a>
+                        )}
                       </div>
                     </div>
                     <h3 className="text-xl font-semibold text-white">{project.name}</h3>
@@ -1112,7 +1296,7 @@ function HomeContent() {
             copy="The story connects student growth, production practice, and community leadership into a product-engineering path."
           />
           <div className="space-y-4">
-            {timeline.map(({ title, org, detail, icon: Icon }, index) => (
+            {timeline.map(({ title, org, detail, icon: Icon, certLink }, index) => (
               <Reveal key={title} delay={index * 0.08}>
                 <motion.div
                   className="glass grid gap-4 rounded-lg p-5 md:grid-cols-[auto_1fr]"
@@ -1126,9 +1310,54 @@ function HomeContent() {
                     <Icon size={22} />
                   </motion.span>
                   <div>
-                    <h3 className="text-xl font-semibold text-white">{title}</h3>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <h3 className="text-xl font-semibold text-white">{title}</h3>
+                      {certLink && (
+                        <a href={certLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 bg-cyan-500/10 text-cyan-300 rounded-full border border-cyan-500/20 hover:bg-cyan-500/20 transition hover:scale-105">
+                          <FileText size={12} /> View Certificate
+                        </a>
+                      )}
+                    </div>
                     <p className="mt-1 text-sm font-medium text-violet-200">{org}</p>
                     <p className="mt-3 text-sm leading-6 text-slate-300">{detail}</p>
+                  </div>
+                </motion.div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ CERTIFICATIONS SECTION ═══════ */}
+      <section id="certifications" className="relative z-10 px-4 py-20">
+        <div className="mx-auto max-w-6xl">
+          <SectionHeading
+            eyebrow="Certifications"
+            title="Continuous Learning & Credentials"
+            copy="Recognized for participation in workshops, events, and achieving foundational competencies in modern AI and data analytics."
+          />
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {certifications.map(({ title, issuer, date, description, image }, index) => (
+              <Reveal key={title} delay={index * 0.1}>
+                <motion.div
+                  className="glass group flex h-full flex-col overflow-hidden rounded-xl"
+                  whileHover={{ y: -8, borderColor: "rgba(103, 232, 249, 0.4)" }}
+                >
+                  <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-white/5 bg-slate-900/50">
+                    <Image
+                      src={image}
+                      alt={title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col p-5">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="text-xs font-semibold text-cyan-200">{date}</span>
+                    </div>
+                    <h3 className="mb-1 text-lg font-bold leading-snug text-white">{title}</h3>
+                    <p className="mb-4 text-sm font-medium text-violet-300">{issuer}</p>
+                    <p className="mt-auto text-sm leading-relaxed text-slate-300">{description}</p>
                   </div>
                 </motion.div>
               </Reveal>
@@ -1148,7 +1377,7 @@ function HomeContent() {
                 The portfolio links directly to GitHub and frames LeetCode as a strength in time complexity, space optimization, and advanced data structures.
               </p>
             </Reveal>
-            <GitHubHeatmap />
+            <GithubCalendar />
           </div>
           <Reveal delay={0.12}>
             <div className="glass rounded-lg p-5">

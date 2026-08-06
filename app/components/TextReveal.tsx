@@ -61,8 +61,7 @@ export function TextReveal({ text, className = "", delay = 0, mode = "word" }: T
       style={{ perspective: mode === "char" ? "600px" : undefined }}
       variants={container}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-10%" }}
+      animate="visible"
     >
       {units.map((unit, index) => {
         const isSpace = unit === " ";
