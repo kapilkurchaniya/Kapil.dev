@@ -1194,7 +1194,11 @@ function HomeContent() {
             copy="Each project is framed around user value, visual proof, and the stack decisions behind the shipped experience."
           />
         </div>
-        <div className="project-track mx-auto flex w-full max-w-full gap-6 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory lg:overflow-visible lg:w-max px-4 lg:px-12">
+        <div
+          className="project-track mx-auto flex w-full max-w-full gap-6 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory lg:overflow-visible lg:w-max px-4 lg:px-12"
+          data-lenis-prevent
+          aria-label="Featured projects. Swipe horizontally to browse."
+        >
           {projects.map((project, index) => (
             <ProjectCard key={project.name} project={project} index={index} />
           ))}

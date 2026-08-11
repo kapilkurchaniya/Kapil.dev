@@ -134,6 +134,9 @@ button:focus-visible {
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
 }
 
 .project-track::-webkit-scrollbar {
@@ -143,6 +146,12 @@ button:focus-visible {
 .project-card {
   scroll-snap-align: center;
   perspective: 1200px;
+}
+
+@media (max-width: 1023px) {
+  .project-track {
+    scroll-padding-inline: 1rem;
+  }
 }
 
 .hero-showcase img,
@@ -601,4 +610,3 @@ html {
     gap: 10px;
   }
 }
-
