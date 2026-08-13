@@ -41,6 +41,7 @@ import { Footer } from "./components/Footer";
 import { CinematicIntro } from "./components/CinematicIntro";
 import GithubCalendar from "./components/GithubCalendar";
 
+
 gsap.registerPlugin(ScrollTrigger);
 
 const navItems = ["Projects", "Stack", "Experience", "Stats", "Contact"];
