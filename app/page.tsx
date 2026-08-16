@@ -40,6 +40,7 @@ import { ContactForm } from "./components/ContactForm";
 import { Footer } from "./components/Footer";
 import { CinematicIntro } from "./components/CinematicIntro";
 import GithubCalendar from "./components/GithubCalendar";
+import { ProjectModal } from "./components/ProjectModal";
 
 
 gsap.registerPlugin(ScrollTrigger);
@@ -56,6 +57,7 @@ type Project = {
   preview: string;
   accent: string;
   metric: string;
+  fullDescription?: string;
 };
 
 const projects: Project[] = [
@@ -67,7 +69,8 @@ const projects: Project[] = [
     stack: ["React", "Next.js", "Tailwind", "TypeScript"],
     preview: "/previews/invest-mp.png",
     accent: "from-blue-400 via-indigo-400 to-violet-400",
-    metric: "Government Prototype"
+    metric: "Government Prototype",
+    fullDescription: "### Global Investors Summit MP 2026\n\nThis platform serves as the official prototype for the Madhya Pradesh 2026 summit. It features a complete registration flow for global investors, integrated government leader directories, and interactive showcases for state-wide investment opportunities. Built for high performance and strict accessibility standards."
   },
   {
     name: "GOVT. CIVIL HOSPITAL OPD",
@@ -77,7 +80,8 @@ const projects: Project[] = [
     stack: ["React", "TypeScript", "Tailwind", "Node.js"],
     preview: "/previews/hospital-management.png",
     accent: "from-teal-300 via-emerald-300 to-blue-400",
-    metric: "Healthcare software"
+    metric: "Healthcare software",
+    fullDescription: "### Govt. Civil Hospital HMS\n\nA full-featured Hospital Management System deployed for the Govt. Civil Hospital in Gadarwara. It digitizes the entire Outpatient Department (OPD) flow, providing staff with secure dashboards for patient records, appointments, and medical history tracking, significantly reducing paper dependency."
   },
   {
     name: "GHSS ASHTA",
@@ -89,7 +93,8 @@ const projects: Project[] = [
     github: "https://github.com/kapilkurchaniya/ashta-project",
     preview: "/previews/ashta-project.png",
     accent: "from-blue-300 via-indigo-300 to-purple-300",
-    metric: "School admin portal"
+    metric: "School admin portal",
+    fullDescription: "### GHSS Ashta Digital Portal\n\nA complete digital presence for Government Higher Secondary School, Ashta. The project includes a highly optimized public-facing Next.js website for students and parents, paired with a secure administrative dashboard where staff can upload notices, manage the gallery, and distribute digital documents."
   },
   {
     name: "MEDIASSIST AI",
@@ -101,7 +106,8 @@ const projects: Project[] = [
     github: "https://github.com/kapilkurchaniya/MediAssist_AI",
     preview: "/previews/mediassist-ai.png",
     accent: "from-cyan-300 via-emerald-300 to-blue-300",
-    metric: "AI healthtech"
+    metric: "AI healthtech",
+    fullDescription: "### MediAssist AI\n\nAn AI-powered healthcare companion that bridges the gap between handwritten clinical prescriptions and structured digital schedules. Leveraging **Google Gemini AI**, it acts as a prescription digitizer and medicine safety checker, utilizing advanced multimodal vision LLMs to automate medical data extraction and ensure patient safety."
   },
   {
     name: "FRIDAY THE ASSISTANT",
@@ -112,7 +118,8 @@ const projects: Project[] = [
     github: "https://github.com/kapilkurchaniya/FRIDAY_THE_ASSITANT",
     preview: "/previews/friday-assistant.png",
     accent: "from-cyan-300 via-teal-300 to-slate-200",
-    metric: "Repo showcase"
+    metric: "Repo showcase",
+    fullDescription: "### Friday The Assistant\n\nA highly modular, Python-first AI assistant. Friday utilizes an LLM intent router and Groq chat fallbacks to ensure snappy responses. It features real-time web search capabilities via Tavily, local system automation scripts, voice I/O integration, and offers both a modern Flask web UI and a PyQt5 desktop application mode."
   },
   {
     name: "KRISHI MITRA",
@@ -124,7 +131,8 @@ const projects: Project[] = [
     github: "https://github.com/kapilkurchaniya/KRISHI-MITRA-",
     preview: "/previews/krishi-mitra.png",
     accent: "from-emerald-300 via-cyan-300 to-violet-300",
-    metric: "AI-first agritech"
+    metric: "AI-first agritech",
+    fullDescription: "### Krishi Mitra\n\nAn AI-centered platform tailored for the agricultural sector. Krishi Mitra provides responsive, data-rich dashboards for monitoring soil health and pH detection. It focuses on intuitive user flows and cinematic product storytelling to make complex agricultural metrics accessible to farmers."
   },
   {
     name: "KARISHMA'S KITCHEN",
@@ -136,7 +144,8 @@ const projects: Project[] = [
     github: "https://github.com/kapilkurchaniya/Karishma-s-kitchen",
     preview: "/previews/karishma-kitchen.png",
     accent: "from-rose-300 via-orange-200 to-cyan-200",
-    metric: "Responsive commerce"
+    metric: "Responsive commerce",
+    fullDescription: "### Karishma's Kitchen\n\nA polished, interactive frontend application built for a modern restaurant. It showcases dynamic digital menus, fully accessible UI states, and smooth transitions designed specifically to enhance food discovery and user engagement across all device sizes."
   },
   {
     name: "TAGORE VIDYA NIKETAN",
@@ -148,7 +157,8 @@ const projects: Project[] = [
     github: "https://github.com/kapilkurchaniya/TOGORE-VIDYA-NIKETAN",
     preview: "/previews/tagore-vidya-niketan.png",
     accent: "from-sky-300 via-indigo-300 to-fuchsia-300",
-    metric: "Learning portal"
+    metric: "Learning portal",
+    fullDescription: "### Tagore Vidya Niketan\n\nA lightning-fast school portal emphasizing clean information hierarchy and structured navigation. The interface is highly optimized for mobile devices, ensuring seamless student and parent journeys for tracking academic resources and announcements."
   },
   {
     name: "REDLIFELINE HUB FOUNDATION",
@@ -160,7 +170,8 @@ const projects: Project[] = [
     github: "https://github.com/kapilkurchaniya/Redlifelline-hub-foundation",
     preview: "/previews/redlifeline.png",
     accent: "from-red-300 via-pink-300 to-teal-200",
-    metric: "Impact platform"
+    metric: "Impact platform",
+    fullDescription: "### RedLifeline Hub Foundation\n\nA comprehensive digital platform developed for an NGO. It features dedicated activity sections, clear content architecture for impact reporting, and a community-focused frontend delivery to drive engagement and volunteer participation."
   }
 ];
 
@@ -496,12 +507,13 @@ function RoleTicker() {
 }
 
 /* ───────── ProjectCard with FloatingOverlay + spotlight glow ───────── */
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+function ProjectCard({ project, index, onClick }: { project: Project; index: number; onClick?: () => void }) {
   return (
     <Reveal className="w-[88vw] max-w-[420px] sm:w-[380px] md:w-[440px] lg:w-[460px] shrink-0 snap-center" delay={index * 0.08}>
-      <TiltCard className="project-card group h-full w-full rounded-lg">
+      <TiltCard className="project-card group h-full w-full rounded-lg cursor-pointer">
         <FloatingOverlay>
           <motion.div
+            onClick={onClick}
             whileTap={{ scale: 0.985 }}
             whileHover={{
               boxShadow: `0 0 60px ${
@@ -909,6 +921,7 @@ function HomeContent() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [booting, setBooting] = useState(true);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const scroll = useSmoothScroll();
   const horizontalRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
@@ -1197,11 +1210,12 @@ function HomeContent() {
         </div>
         <div
           className="project-track mx-auto flex w-full max-w-full gap-6 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory lg:overflow-visible lg:w-max px-4 lg:px-12"
-          data-lenis-prevent
+          role="region"
           aria-label="Featured projects. Swipe horizontally to browse."
+          data-lenis-prevent="true"
         >
           {projects.map((project, index) => (
-            <ProjectCard key={project.name} project={project} index={index} />
+            <ProjectCard key={project.name} project={project} index={index} onClick={() => setSelectedProject(project)} />
           ))}
         </div>
         <div className="mx-auto mt-32 max-w-6xl">
@@ -1419,6 +1433,8 @@ function HomeContent() {
 
       {/* ═══════ FOOTER ═══════ */}
       <Footer onScrollToTop={handleScrollToTop} />
+      
+      <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
     </main>
   );
 }
