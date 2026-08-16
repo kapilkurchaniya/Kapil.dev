@@ -99,7 +99,7 @@ export function CustomCursor() {
     <>
       {/* Main cursor — simple circle, no spring/magnetic */}
       <div
-        className="pointer-events-none fixed left-0 top-0 z-[100] flex items-center justify-center rounded-full border"
+        className="pointer-events-none fixed left-0 top-0 z-[9999] flex items-center justify-center rounded-full border"
         style={{
           width: size,
           height: size,
@@ -135,20 +135,7 @@ export function CustomCursor() {
           }}
         />
 
-        {/* "VIEW" label — visible on project cards */}
-        <AnimatePresence>
-          {variant === "project" && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.6, filter: "blur(6px)" }}
-              animate={{ opacity: 1, scale: 1, filter: "blur(0.01px)" }}
-              exit={{ opacity: 0, scale: 0.6, filter: "blur(6px)" }}
-              transition={{ duration: 0.2 }}
-              className="absolute text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-100"
-            >
-              View
-            </motion.span>
-          )}
-        </AnimatePresence>
+        {/* Removed 'VIEW' label to prevent overlap with project images */}
       </div>
 
       {/* Click ripples */}
@@ -160,7 +147,7 @@ export function CustomCursor() {
             animate={{ scale: 2.5, opacity: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.55, ease: "easeOut" }}
-            className="pointer-events-none fixed z-[98] rounded-full border border-cyan-300/40"
+            className="pointer-events-none fixed z-[9998] rounded-full border border-cyan-300/40"
             style={{
               left: ripple.x - 20,
               top: ripple.y - 20,
