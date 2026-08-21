@@ -42,7 +42,6 @@ import { CinematicIntro } from "./components/CinematicIntro";
 import GithubCalendar from "./components/GithubCalendar";
 import { ProjectModal } from "./components/ProjectModal";
 
-
 gsap.registerPlugin(ScrollTrigger);
 
 const navItems = ["Projects", "Stack", "Experience", "Stats", "Contact"];
@@ -184,19 +183,38 @@ const moreProjects: Array<{name: string; summary: string; stack: string[]; href?
   }
 ];
 
-const skills = [
-  ["React.js", "94", Code2],
-  ["TypeScript", "90", Terminal],
-  ["Node.js", "86", Server],
-  ["Express.js", "84", Server],
-  ["MongoDB", "82", Database],
-  ["Tailwind CSS", "95", Sparkles],
-  ["GSAP", "88", Zap],
-  ["Three.js", "82", BrainCircuit],
-  ["Framer Motion", "92", Rocket],
-  ["Firebase", "80", Database],
-  ["GitHub", "90", Github]
-] as const;
+const skillCategories = [
+  {
+    category: "Frontend",
+    icon: Code2,
+    skills: ["HTML5", "CSS3", "JavaScript", "React.js", "Next.js", "Tailwind CSS", "Framer Motion"]
+  },
+  {
+    category: "Backend",
+    icon: Server,
+    skills: ["Node.js", "Express.js", "REST API", "Authentication & Authorization", "Socket.IO"]
+  },
+  {
+    category: "Database",
+    icon: Database,
+    skills: ["MongoDB", "PostgreSQL", "Prisma"]
+  },
+  {
+    category: "Development",
+    icon: Terminal,
+    skills: ["MERN Stack", "Full-Stack Development", "Responsive Web Design", "API Integration"]
+  },
+  {
+    category: "Tools & Deployment",
+    icon: Github,
+    skills: ["Git", "GitHub", "Vercel", "Render", "Postman", "VS Code"]
+  },
+  {
+    category: "AI",
+    icon: Bot,
+    skills: ["RAG", "LangChain", "LangGraph", "n8n", "Vector & Embedding", "LLM API Integration", "Generative AI"]
+  }
+];
 
 const timeline = [
   {
@@ -1271,33 +1289,25 @@ function HomeContent() {
             title="Floating tools for modern product engineering."
             copy="A motion-first skill grid that highlights frontend craft, backend delivery, data flow, animation, and 3D interaction."
           />
-          <StaggerReveal className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" stagger={0.045}>
-            {skills.map(([label, level, Icon]) => (
-              <StaggerItem key={label}>
+          <StaggerReveal className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" stagger={0.1}>
+            {skillCategories.map(({ category, icon: Icon, skills }) => (
+              <StaggerItem key={category}>
                 <motion.div
-                  className="glass group rounded-lg p-5 transition hover:border-cyan-200/35"
-                  whileHover={{ y: -7, scale: 1.015 }}
-                  whileTap={{ scale: 0.99 }}
+                  className="glass group h-full rounded-lg p-6 transition hover:border-cyan-200/35"
+                  whileHover={{ y: -4 }}
                 >
-                  <div className="mb-5 flex items-center justify-between">
-                    <motion.span
-                      whileHover={{ rotate: [0, -8, 8, 0] }}
-                      transition={{ duration: 0.42 }}
-                      className="grid size-11 place-items-center rounded-md bg-white/10 text-cyan-200 transition group-hover:bg-cyan-300 group-hover:text-slate-950"
-                    >
-                      <Icon size={21} />
-                    </motion.span>
-                    <span className="text-sm font-semibold text-cyan-100">{level}%</span>
+                  <div className="mb-6 flex items-center gap-3">
+                    <span className="grid size-10 place-items-center rounded-md bg-white/10 text-cyan-200 transition group-hover:bg-cyan-300 group-hover:text-slate-950">
+                      <Icon size={20} />
+                    </span>
+                    <h3 className="text-lg font-semibold text-white">{category}</h3>
                   </div>
-                  <h3 className="text-lg font-semibold text-white">{label}</h3>
-                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${level}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1, delay: 0.12 }}
-                      className="h-full rounded-full bg-gradient-to-r from-cyan-300 via-violet-300 to-fuchsia-300"
-                    />
+                  <div className="flex flex-wrap gap-2">
+                    {skills.map((skill) => (
+                      <span key={skill} className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-300 transition group-hover:border-cyan-200/20 group-hover:text-slate-200">
+                        {skill}
+                      </span>
+                    ))}
                   </div>
                 </motion.div>
               </StaggerItem>
