@@ -282,12 +282,26 @@ export function CinematicIntro({
       /* Hold finale for 0.35s */
       tl.addLabel("finaleHold", "+=0.35");
 
-      /* ═══ Phase 6: Fast Exit to Portfolio ═══ */
+      /* ═══ Phase 6: Fast Exit to Portfolio (Split Animation) ═══ */
       tl.to(
-        root,
-        { opacity: 0, duration: 0.4, ease: "power2.inOut" },
+        [camera, ".ci-skip"],
+        { opacity: 0, duration: 0.3, ease: "power2.inOut" },
         "finaleHold"
       );
+
+      tl.to(
+        ".ci-bg-top",
+        { yPercent: -100, duration: 1.2, ease: "power4.inOut" },
+        "finaleHold+=0.2"
+      );
+
+      tl.to(
+        ".ci-bg-bottom",
+        { yPercent: 100, duration: 1.2, ease: "power4.inOut" },
+        "finaleHold+=0.2"
+      );
+
+      tl.set(root, { autoAlpha: 0 });
     }, root);
 
     return () => ctx.revert();
@@ -297,6 +311,9 @@ export function CinematicIntro({
 
   return (
     <div ref={containerRef} className="ci-container" aria-hidden="true">
+      <div className="ci-bg-top" />
+      <div className="ci-bg-bottom" />
+      
       {/* ── Cyan dot ── */}
       <div className="ci-dot" />
 
