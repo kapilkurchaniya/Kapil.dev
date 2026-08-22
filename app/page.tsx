@@ -66,6 +66,7 @@ const projects: Project[] = [
     summary:
       "A prototype platform developed for the Global Investors Summit Madhya Pradesh 2026. Designed to showcase investment opportunities, facilitate registrations, and connect government leaders with global investors.",
     stack: ["React", "Next.js", "Tailwind", "TypeScript"],
+    href: "https://invest-mp-53qf.vercel.app/",
     preview: "/previews/invest-mp.png",
     accent: "from-blue-400 via-indigo-400 to-violet-400",
     metric: "Government Prototype",
@@ -990,7 +991,7 @@ function HomeContent() {
           return undefined;
         }
 
-        const getDistance = () => Math.max(0, track.scrollWidth - section.offsetWidth + 96);
+        const getDistance = () => Math.max(0, track.scrollWidth - window.innerWidth + 96);
         const tween = gsap.to(track, {
           x: () => -getDistance(),
           ease: "none",
@@ -1000,7 +1001,7 @@ function HomeContent() {
             scrub: 0.45,
             anticipatePin: 1,
             start: "top top",
-            end: () => `+=${getDistance() + 420}`,
+            end: () => `+=${getDistance() + 100}`,
             invalidateOnRefresh: true
           }
         });
@@ -1227,16 +1228,18 @@ function HomeContent() {
           />
         </div>
         <div
-          className="project-track mx-auto flex w-full max-w-full gap-6 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory lg:overflow-visible lg:w-max px-4 lg:px-12"
+          className="project-track mx-auto flex flex-col lg:flex-row w-full max-w-full gap-8 lg:gap-6 pb-6 pt-2 lg:overflow-visible lg:w-max px-4 lg:px-12"
           role="region"
-          aria-label="Featured projects. Swipe horizontally to browse."
-          data-lenis-prevent="true"
+          aria-label="Featured projects."
         >
           {projects.map((project, index) => (
             <ProjectCard key={project.name} project={project} index={index} onClick={() => setSelectedProject(project)} />
           ))}
         </div>
-        <div className="mx-auto mt-32 max-w-6xl">
+      </section>
+
+      <section className="relative z-10 px-4 py-10 lg:py-20">
+        <div className="mx-auto max-w-6xl">
           <Reveal>
             <p className="mb-6 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200">More Projects</p>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
