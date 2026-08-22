@@ -528,7 +528,7 @@ function RoleTicker() {
 /* ───────── ProjectCard with FloatingOverlay + spotlight glow ───────── */
 function ProjectCard({ project, index, onClick }: { project: Project; index: number; onClick?: () => void }) {
   return (
-    <Reveal className="w-[88vw] max-w-[420px] sm:w-[380px] md:w-[440px] lg:w-[460px] shrink-0 snap-center" delay={index * 0.08}>
+    <div className="w-[88vw] max-w-[420px] sm:w-[380px] md:w-[440px] lg:w-[460px] shrink-0 snap-center">
       <TiltCard className="project-card group h-full w-full rounded-lg cursor-pointer">
         <FloatingOverlay>
           <motion.div
@@ -560,15 +560,9 @@ function ProjectCard({ project, index, onClick }: { project: Project; index: num
                 className="object-cover object-top transition duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/10 to-transparent" />
-              <motion.span
-                initial={{ opacity: 0, y: -8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.18 + index * 0.04 }}
-                className="absolute left-4 top-4 z-10 rounded-md border border-cyan-200/45 bg-slate-950/85 px-3 py-1 text-xs font-semibold text-cyan-100 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-md"
-              >
+              <span className="absolute left-4 top-4 z-10 rounded-md border border-cyan-200/45 bg-slate-950/85 px-3 py-1 text-xs font-semibold text-cyan-100 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-md">
                 {project.metric}
-              </motion.span>
+              </span>
             </div>
             <div className="relative flex flex-1 flex-col p-2 pt-5">
               <div className="flex items-start justify-between gap-4">
@@ -585,6 +579,7 @@ function ProjectCard({ project, index, onClick }: { project: Project; index: num
                       aria-label={`GitHub repo for ${project.name}`}
                       whileHover={{ scale: 1.1, rotate: -5 }}
                       className="grid size-10 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-slate-300 transition group-hover:bg-white/10 group-hover:text-white"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <Github size={18} />
                     </motion.a>
@@ -597,6 +592,7 @@ function ProjectCard({ project, index, onClick }: { project: Project; index: num
                       aria-label={`Open ${project.name}`}
                       whileHover={{ rotate: 12 }}
                       className="grid size-10 place-items-center rounded-md border border-white/10 bg-white/[0.04] text-cyan-200 transition group-hover:-translate-y-1 group-hover:translate-x-1"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <ArrowUpRight size={18} />
                     </motion.a>
@@ -604,20 +600,18 @@ function ProjectCard({ project, index, onClick }: { project: Project; index: num
                 </div>
               </div>
               <p className="mt-4 text-sm leading-6 text-slate-300">{project.summary}</p>
-              <StaggerReveal className="mt-auto flex flex-wrap gap-2 pt-6" delay={0.1} stagger={0.045}>
+              <div className="mt-auto flex flex-wrap gap-2 pt-6">
                 {project.stack.map((item) => (
-                  <StaggerItem key={item}>
-                    <span className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-200">
-                      {item}
-                    </span>
-                  </StaggerItem>
+                  <span key={item} className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-200">
+                    {item}
+                  </span>
                 ))}
-              </StaggerReveal>
+              </div>
             </div>
           </motion.div>
         </FloatingOverlay>
       </TiltCard>
-    </Reveal>
+    </div>
   );
 }
 
@@ -991,21 +985,22 @@ function HomeContent() {
           return undefined;
         }
 
-        const getDistance = () => Math.max(0, track.offsetWidth - window.innerWidth);
+        const getDistance = () => Math.max(0, track.scrollWidth - window.innerWidth + 96);
         const tween = gsap.to(track, {
           x: () => -getDistance(),
           ease: "none",
           scrollTrigger: {
             trigger: section,
             pin: true,
-            scrub: 0.45,
+            scrub: 0.5,
             anticipatePin: 1,
             start: "top top",
             end: () => `+=${getDistance()}`,
             invalidateOnRefresh: true
           }
         });
-        const refresh = window.setTimeout(() => ScrollTrigger.refresh(), 250);
+
+        const refresh = window.setTimeout(() => ScrollTrigger.refresh(), 300);
 
         return () => {
           window.clearTimeout(refresh);
@@ -1016,6 +1011,15 @@ function HomeContent() {
 
     return () => context.revert();
   }, []);
+
+  useEffect(() => {
+    if (!booting) {
+      const timer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [booting]);
 
   const scrollToSection = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!href.startsWith("#")) {
@@ -1228,10 +1232,9 @@ function HomeContent() {
           />
         </div>
         <div
-          className="project-track flex w-full max-w-full gap-6 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory lg:overflow-visible lg:w-max px-4 lg:px-[8vw]"
+          className="project-track flex w-full gap-6 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory lg:overflow-visible lg:w-max px-4 lg:px-12"
           role="region"
           aria-label="Featured projects. Swipe horizontally to browse."
-          data-lenis-prevent="true"
         >
           {projects.map((project, index) => (
             <ProjectCard key={project.name} project={project} index={index} onClick={() => setSelectedProject(project)} />
