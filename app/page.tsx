@@ -421,7 +421,7 @@ function AnimatedStatValue({ value }: { value: string }) {
   const isPercent = value.endsWith("%");
   const numericValue = Number(value.replace("%", ""));
 
-  if (Number.isNaN(numericValue)) {
+   if (Number.isNaN(numericValue)) {
     return value;
   }
 
