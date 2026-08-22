@@ -41,6 +41,7 @@ import { Footer } from "./components/Footer";
 import { CinematicIntro } from "./components/CinematicIntro";
 import GithubCalendar from "./components/GithubCalendar";
 import { ProjectModal } from "./components/ProjectModal";
+import { EmailSideModal } from "./components/EmailSideModal";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -935,6 +936,7 @@ function HomeContent() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [booting, setBooting] = useState(true);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
   const scroll = useSmoothScroll();
   const horizontalRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
@@ -1175,13 +1177,24 @@ function HomeContent() {
             >
               Building immersive digital experiences with AI, 3D, and modern frontend engineering.
             </motion.p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap items-center gap-3">
               <GlowButton href="#projects" onClick={(event) => scrollToSection(event, "#projects")}>
                 Explore work <ArrowUpRight size={17} />
               </GlowButton>
-              <GlowButton href="mailto:kapilkurchaniya98@gmail.com" variant="secondary">
-                Contact <Mail size={17} />
+              <GlowButton href="#contact" onClick={(event) => scrollToSection(event, "#contact")} variant="secondary">
+                Contact <Send size={16} />
               </GlowButton>
+              <motion.button
+                type="button"
+                onClick={() => setEmailModalOpen(true)}
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.96 }}
+                className="group inline-flex min-h-12 items-center gap-2 rounded-md border border-cyan-300/40 bg-cyan-300/10 px-4 text-sm font-semibold text-cyan-200 shadow-[0_0_20px_rgba(103,232,249,0.15)] transition hover:border-cyan-300 hover:bg-cyan-300 hover:text-slate-950"
+                aria-label="Direct Email"
+                title="View & Copy Email"
+              >
+                <Mail size={17} className="transition group-hover:scale-110" /> Email Me
+              </motion.button>
             </div>
             <StaggerReveal className="mt-8 flex flex-wrap gap-3 text-sm text-slate-300" delay={0.42} stagger={0.09}>
               <StaggerItem>
@@ -1434,10 +1447,16 @@ function HomeContent() {
               <p className="mt-4 text-base leading-7 text-slate-300">
                 Available for internships, startup-style product work, MERN development, AI-integrated web apps, and technical multimedia production.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <GlowButton href="mailto:kapilkurchaniya98@gmail.com">
-                  Email <Mail size={17} />
-                </GlowButton>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <motion.button
+                  type="button"
+                  onClick={() => setEmailModalOpen(true)}
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="inline-flex min-h-12 items-center gap-2 rounded-md bg-cyan-300 px-5 text-sm font-semibold text-slate-950 shadow-glow transition hover:bg-cyan-200"
+                >
+                  Direct Email <Mail size={17} />
+                </motion.button>
                 <GlowButton href="/Kapil-Kurchaniya-Resume.pdf" variant="secondary" download>
                   Resume <Download size={17} />
                 </GlowButton>
@@ -1452,6 +1471,12 @@ function HomeContent() {
       <Footer onScrollToTop={handleScrollToTop} />
       
       <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+      
+      <EmailSideModal
+        isOpen={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        onNavigateToContact={() => scroll?.scrollTo("#contact")}
+      />
     </main>
   );
 }

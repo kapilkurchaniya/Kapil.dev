@@ -52,7 +52,19 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
     <SmoothScrollContext.Provider
       value={{
         scrollTo: (target) => {
-          lenisRef.current?.scrollTo(target, { offset: -88, duration: 1.15 });
+          if (typeof target === "string" && target.startsWith("#")) {
+            const el = document.querySelector(target);
+            if (el && lenisRef.current) {
+              lenisRef.current.scrollTo(el as HTMLElement, { offset: -60, duration: 1.15 });
+              return;
+            } else if (el) {
+              el.scrollIntoView({ behavior: "smooth" });
+              return;
+            }
+          }
+          if (lenisRef.current) {
+            lenisRef.current.scrollTo(target, { offset: -60, duration: 1.15 });
+          }
         }
       }}
     >
