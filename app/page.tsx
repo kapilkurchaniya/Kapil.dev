@@ -991,7 +991,7 @@ function HomeContent() {
           return undefined;
         }
 
-        const getDistance = () => Math.max(0, track.scrollWidth - window.innerWidth + 96);
+        const getDistance = () => Math.max(0, track.offsetWidth - window.innerWidth);
         const tween = gsap.to(track, {
           x: () => -getDistance(),
           ease: "none",
@@ -1001,7 +1001,7 @@ function HomeContent() {
             scrub: 0.45,
             anticipatePin: 1,
             start: "top top",
-            end: () => `+=${getDistance() + 100}`,
+            end: () => `+=${getDistance()}`,
             invalidateOnRefresh: true
           }
         });
@@ -1228,9 +1228,10 @@ function HomeContent() {
           />
         </div>
         <div
-          className="project-track mx-auto flex flex-col lg:flex-row w-full max-w-full gap-8 lg:gap-6 pb-6 pt-2 lg:overflow-visible lg:w-max px-4 lg:px-12"
+          className="project-track flex w-full max-w-full gap-6 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory lg:overflow-visible lg:w-max px-4 lg:px-[8vw]"
           role="region"
-          aria-label="Featured projects."
+          aria-label="Featured projects. Swipe horizontally to browse."
+          data-lenis-prevent="true"
         >
           {projects.map((project, index) => (
             <ProjectCard key={project.name} project={project} index={index} onClick={() => setSelectedProject(project)} />
