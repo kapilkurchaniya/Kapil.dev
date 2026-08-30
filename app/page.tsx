@@ -1457,7 +1457,7 @@ function HomeContent() {
                 >
                   Direct Email <Mail size={17} />
                 </motion.button>
-                <GlowButton href="/Kapil-Kurchaniya-Resume.pdf" variant="secondary" download>
+                <GlowButton href="/Kapil_Kurchaniya_Resume_Enhanced.docx" variant="secondary" download>
                   Resume <Download size={17} />
                 </GlowButton>
               </div>
