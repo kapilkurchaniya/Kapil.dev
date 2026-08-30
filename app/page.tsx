@@ -98,17 +98,17 @@ const projects: Project[] = [
     fullDescription: "### GHSS Ashta Digital Portal\n\nA complete digital presence for Government Higher Secondary School, Ashta. The project includes a highly optimized public-facing Next.js website for students and parents, paired with a secure administrative dashboard where staff can upload notices, manage the gallery, and distribute digital documents."
   },
   {
-    name: "MEDIASSIST AI",
+    name: "CURORA AI",
     type: "AI Healthcare Platform",
     summary:
       "Prescription digitizer and medicine safety checker powered by Google Gemini AI, built for fast extraction and safer medication review.",
     stack: ["TypeScript", "React", "Gemini AI", "Tailwind"],
-    href: "https://mediassist-ai-services.vercel.app/",
+    href: "https://curora-ai.vercel.app/",
     github: "https://github.com/kapilkurchaniya/MediAssist_AI",
     preview: "/previews/mediassist-ai.png",
     accent: "from-cyan-300 via-emerald-300 to-blue-300",
     metric: "AI healthtech",
-    fullDescription: "### MediAssist AI\n\nAn AI-powered healthcare companion that bridges the gap between handwritten clinical prescriptions and structured digital schedules. Leveraging **Google Gemini AI**, it acts as a prescription digitizer and medicine safety checker, utilizing advanced multimodal vision LLMs to automate medical data extraction and ensure patient safety."
+    fullDescription: "### Curora AI\n\nAn AI-powered healthcare companion that bridges the gap between handwritten clinical prescriptions and structured digital schedules. Leveraging **Google Gemini AI**, it acts as a prescription digitizer and medicine safety checker, utilizing advanced multimodal vision LLMs to automate medical data extraction and ensure patient safety."
   },
   {
     name: "FRIDAY THE ASSISTANT",
@@ -630,7 +630,7 @@ function AIAssistant() {
   const [active, setActive] = useState(0);
 
   const replies = [
-    "MEDIASSIST AI, FRIDAY THE ASSISTANT, and KRISHI MITRA are the strongest AI-product signals: healthcare safety workflows, voice assistant routing, agriculture context, responsive flows, and clear product stories.",
+    "CURORA AI, FRIDAY THE ASSISTANT, and KRISHI MITRA are the strongest AI-product signals: healthcare safety workflows, voice assistant routing, agriculture context, responsive flows, and clear product stories.",
     "Kapil is an AI-focused full stack builder who ships React + Node products with interface discipline and practical product instincts.",
     "Frontend: TypeScript, React, Tailwind, Framer Motion, GSAP. Backend: Node, Express, REST APIs, MongoDB, Firebase."
   ];
