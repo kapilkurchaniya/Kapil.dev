@@ -105,7 +105,7 @@ const projects: Project[] = [
     stack: ["TypeScript", "React", "Gemini AI", "Tailwind"],
     href: "https://curora-ai.vercel.app/",
     github: "https://github.com/kapilkurchaniya/MediAssist_AI",
-    preview: "/previews/mediassist-ai.png",
+    preview: "/previews/curora-ai.png",
     accent: "from-cyan-300 via-emerald-300 to-blue-300",
     metric: "AI healthtech",
     fullDescription: "### Curora AI\n\nAn AI-powered healthcare companion that bridges the gap between handwritten clinical prescriptions and structured digital schedules. Leveraging **Google Gemini AI**, it acts as a prescription digitizer and medicine safety checker, utilizing advanced multimodal vision LLMs to automate medical data extraction and ensure patient safety."
