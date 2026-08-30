@@ -1,4 +1,4 @@
-# Kapil's AI Portfolio
+  # Kapil's AI Portfolio
 
 A modern, highly interactive, and beautifully animated personal portfolio website built with Next.js 15, React 19, and Tailwind CSS. The portfolio showcases a cinematic project display, smooth scrolling, and complex animations powered by Framer Motion and GSAP.
 
