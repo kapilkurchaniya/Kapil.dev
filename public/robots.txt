@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://kapils-portfolio.vercel.app/sitemap.xml
+Sitemap: https://www.kapiln.in/sitemap.xml

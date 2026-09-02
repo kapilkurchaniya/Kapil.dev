@@ -6,7 +6,7 @@ This is Kapil Kurchaniya's personal portfolio website. It presents selected work
 
 The project was assembled with modern AI-assisted/vibe-coding workflows alongside Kapil's own design direction, content, testing, integration work, and deployment decisions. In practical terms, the code is a real production Next.js application: it has a responsive front end, server-side API routes, environment-based secrets, asset optimisation, SEO metadata, and a live Vercel deployment.
 
-**Live site:** https://kapils-portfolio.vercel.app  
+**Live site:** https://www.kapiln.in  
 **Framework:** Next.js 15 with React 19 and TypeScript  
 **Hosting:** Vercel  
 **Primary source folder:** `app/`
@@ -191,7 +191,7 @@ This server proxy is important because it keeps the Personal Access Token out of
 The portfolio includes basic technical SEO:
 
 - `layout.tsx` defines title, description, keywords, canonical URL, Open Graph metadata, Twitter card metadata, author, and theme colour.
-- `metadataBase` is set to `https://kapils-portfolio.vercel.app`, allowing correct absolute metadata URLs.
+- `metadataBase` is set to `https://www.kapiln.in`, allowing correct absolute metadata URLs.
 - `public/robots.txt` allows search crawlers and points them to the sitemap.
 - `public/sitemap.xml` lists the home page and online resume with update frequency and priority.
 - Semantic HTML, clear headings, image `alt` text, labelled form fields, and focus-visible styles improve accessibility and crawlability.
@@ -237,7 +237,7 @@ npm run start
 npx vercel deploy --prod
 ```
 
-5. Vercel installs dependencies, runs `npm run build`, creates optimized static files and serverless functions, and aliases the successful production deployment to `https://kapils-portfolio.vercel.app`.
+5. Vercel installs dependencies, runs `npm run build`, creates optimized static files and serverless functions, and aliases the successful production deployment to `https://www.kapiln.in`.
 
 The latest verified deployment built successfully with Next.js 15.5.18 and returned HTTP 200 on the production domain.
 

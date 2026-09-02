@@ -13,33 +13,65 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kapils-portfolio.vercel.app"),
-  title: "Kapil Kurchaniya | AI Engineer + Full Stack Product Builder",
+  metadataBase: new URL("https://www.kapiln.in"),
+  title: {
+    default: "Kapil Kurchaniya | AI Engineer + Full Stack Product Builder",
+    template: "%s | Kapil Kurchaniya",
+  },
   description:
-    "Modern portfolio for Kapil Kurchaniya, an AI-focused full stack developer building MERN products, dashboards, and scalable frontend systems.",
-  keywords: ["Kapil Kurchaniya", "Full Stack Developer", "AI Engineer", "React", "Next.js", "MERN", "Portfolio"],
-  authors: [{ name: "Kapil Kurchaniya" }],
+    "Portfolio of Kapil Kurchaniya — AI-focused full stack developer from India building MERN products, dashboards, healthcare AI tools, and scalable frontend systems with React, Next.js, Node.js & TypeScript.",
+  keywords: [
+    "Kapil Kurchaniya",
+    "kapiln.in",
+    "Full Stack Developer",
+    "AI Engineer",
+    "React Developer",
+    "Next.js Developer",
+    "MERN Stack Developer",
+    "Portfolio",
+    "Web Developer India",
+    "Node.js",
+    "TypeScript",
+    "Tailwind CSS",
+    "Frontend Engineer",
+    "AI Product Builder",
+    "Freelance Developer India",
+  ],
+  authors: [{ name: "Kapil Kurchaniya", url: "https://www.kapiln.in" }],
+  creator: "Kapil Kurchaniya",
+  publisher: "Kapil Kurchaniya",
   alternates: {
-    canonical: "/",
+    canonical: "https://www.kapiln.in",
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "googlea6d38f57acd5b815",
   },
   openGraph: {
     title: "Kapil Kurchaniya | AI Engineer + Full Stack Product Builder",
     description:
-      "Modern portfolio for Kapil Kurchaniya, an AI-focused full stack developer building MERN products, dashboards, and scalable frontend systems.",
-    url: "/",
-    siteName: "Kapil Kurchaniya Portfolio",
+      "Portfolio of Kapil Kurchaniya — AI-focused full stack developer from India building MERN products, dashboards, healthcare AI tools, and scalable frontend systems.",
+    url: "https://www.kapiln.in",
+    siteName: "Kapil Kurchaniya — kapiln.in",
     type: "website",
-    locale: "en_US",
+    locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
     title: "Kapil Kurchaniya | AI Engineer + Full Stack Product Builder",
     description:
-      "Modern portfolio for Kapil Kurchaniya, an AI-focused full stack developer.",
+      "Portfolio of Kapil Kurchaniya — AI-focused full stack developer building MERN products, AI tools & scalable systems.",
+    creator: "@kapilkurchaniya",
   },
   other: {
     "theme-color": "#050713",
@@ -53,12 +85,57 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://www.kapiln.in/#person",
+        name: "Kapil Kurchaniya",
+        url: "https://www.kapiln.in",
+        jobTitle: "AI Engineer & Full Stack Developer",
+        description:
+          "AI-focused full stack developer from India building MERN products, dashboards, healthcare AI tools, and scalable frontend systems.",
+        sameAs: [
+          "https://github.com/kapilkurchaniya",
+          "https://www.linkedin.com/in/kapil-kurchaniya-961589353",
+        ],
+        knowsAbout: [
+          "React",
+          "Next.js",
+          "Node.js",
+          "TypeScript",
+          "MongoDB",
+          "AI",
+          "MERN Stack",
+          "Tailwind CSS",
+          "Full Stack Development",
+        ],
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.kapiln.in/#website",
+        url: "https://www.kapiln.in",
+        name: "Kapil Kurchaniya Portfolio",
+        description:
+          "Portfolio of Kapil Kurchaniya — AI-focused full stack developer.",
+        publisher: { "@id": "https://www.kapiln.in/#person" },
+        inLanguage: "en-IN",
+      },
+    ],
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="canonical" href="https://www.kapiln.in" />
         <meta name="theme-color" content="#050713" media="(prefers-color-scheme: dark)" />
         <meta name="theme-color" content="#f8fbff" media="(prefers-color-scheme: light)" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className={`${inter.variable} antialiased`}>
         <CustomCursor />
