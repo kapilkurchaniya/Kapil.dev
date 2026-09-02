@@ -129,6 +129,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="canonical" href="https://www.kapiln.in" />
         <meta name="theme-color" content="#050713" media="(prefers-color-scheme: dark)" />
         <meta name="theme-color" content="#f8fbff" media="(prefers-color-scheme: light)" />
