@@ -62,6 +62,18 @@ type Project = {
 
 const projects: Project[] = [
   {
+    name: "DRISHTI-MPLADS",
+    type: "Smart India Hackathon",
+    summary:
+      "AI-powered public fund monitoring platform utilizing anomaly detection, predictive analysis, and GIS to monitor MPLADS projects in real time.",
+    stack: ["React", "Next.js", "Tailwind", "AI/ML"],
+    href: "https://drishti-mplads-ai.vercel.app/",
+    preview: "/previews/drishti-mplads.png",
+    accent: "from-blue-600 via-indigo-600 to-violet-600",
+    metric: "AI Governance Platform",
+    fullDescription: "### Made for Smart India Hackathon\n\nDRISHTI-MPLADS is an AI-powered public fund monitoring platform that helps authorities monitor MPLADS projects in real time. It combines anomaly detection, risk scoring, predictive analysis, AI document auditing, GIS-based monitoring, and duplicate-project detection to identify potential issues early. The platform also provides investigation workflows, alerts, reports, and a citizen transparency portal to improve accountability and data-driven governance."
+  },
+  {
     name: "INVEST MADHYA PRADESH 2026",
     type: "Contribution Project",
     summary:
