@@ -630,7 +630,7 @@ function ProjectCard({ project, index, onClick }: { project: Project; index: num
   );
 }
 
-/* ───────── Live project card with scroll-through hover ───────── */
+ /* ───────── Live project card with scroll-through hover ───────── */
 /* ───────── AI Assistant ───────── */
 function AIAssistant() {
   const chatState = useChat({
