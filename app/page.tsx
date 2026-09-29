@@ -636,7 +636,7 @@ function AIAssistant() {
   const chatState = useChat({
     api: '/api/chat',
   } as any) as any;
-  const messages = chatState.messages || [];
+  const messages = useMemo(() => chatState.messages || [], [chatState.messages]);
   const sendMessage = chatState.sendMessage || chatState.append;
   const append = chatState.append || chatState.sendMessage;
   const isLoading = chatState.status === 'submitted' || chatState.status === 'streaming' || chatState.isLoading;
@@ -755,7 +755,7 @@ function AIAssistant() {
                       <Bot size={32} className="text-cyan-200" />
                     </div>
                     <p className="text-sm text-slate-300 max-w-[250px] leading-relaxed">
-                      Hi! I'm Kapil's AI assistant. Ask me anything about his projects, tech stack, or experience.
+                      Hi! I&apos;m Kapil&apos;s AI assistant. Ask me anything about his projects, tech stack, or experience.
                     </p>
                     <div className="flex flex-col gap-2 w-full max-w-xs mt-6">
                       {prompts.map(p => (
