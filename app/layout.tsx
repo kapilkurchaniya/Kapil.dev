@@ -12,6 +12,8 @@ const inter = Inter({
   display: "swap"
 });
 
+
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.kapiln.in"),
   title: {

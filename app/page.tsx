@@ -14,7 +14,7 @@ import {
   Github,
   GraduationCap,
   Linkedin,
-  Loader2,
+
   Mail,
   MapPin,
   Menu,
@@ -27,9 +27,10 @@ import {
   Terminal,
   Trophy,
   X,
-  Zap
+  Zap,
+  ChevronDown,
+  MessageCircleQuestion
 } from "lucide-react";
-import { useChat } from "@ai-sdk/react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -632,200 +633,99 @@ function ProjectCard({ project, index, onClick }: { project: Project; index: num
 
  /* ───────── Live project card with scroll-through hover ───────── */
 /* ───────── AI Assistant ───────── */
+const kapilFaqData = [
+  {
+    question: "Who is Kapil?",
+    answer: "Kapil Kurchaniya is a Full Stack Developer & AI integration specialist, currently pursuing B.Tech in Information Technology at Oriental Institute of Science and Technology (Expected 2028). He specializes in building production-grade web apps with modern frameworks and integrating AI/LLM capabilities.",
+  },
+  {
+    question: "What are his top projects?",
+    answer: "Some highlights include DRISHTI-MPLADS — an AI-powered public fund monitoring platform built for Smart India Hackathon, INVEST MADHYA PRADESH 2026 — the official prototype for the Global Investors Summit, GOVT. CIVIL HOSPITAL OPD — a Hospital Management System for a government hospital, and CURORA AI — an AI healthcare companion for prescription digitizing and safety checks.",
+  },
+  {
+    question: "What tech stack does he use?",
+    answer: "Frontend: React.js, Next.js, TypeScript, Tailwind CSS, Framer Motion, GSAP. Backend: Node.js, Express.js, MongoDB, PostgreSQL. AI/ML: RAG, LangChain, LangGraph, n8n, LLM API Integration (Gemini, Groq), Vector DBs.",
+  },
+  {
+    question: "What is his experience?",
+    answer: "Kapil has worked as a Full Stack Intern at Anav WebTech and a MERN Stack Intern at Cybrom Technology, building real-world applications and gaining hands-on experience with production deployments and client projects.",
+  },
+  {
+    question: "How can I contact him?",
+    answer: "You can reach Kapil via email at kapilkurchaniya98@gmail.com or use the contact form on this portfolio. He's open to freelance projects, collaborations, and full-time opportunities.",
+  },
+  {
+    question: "How was this portfolio built?",
+    answer: "This portfolio is built with Next.js 15, React 19, TypeScript, Tailwind CSS, Framer Motion, and GSAP — showcasing modern web development practices with smooth animations and responsive design.",
+  },
+];
+
 function AIAssistant() {
-  const chatState = useChat({
-    api: '/api/chat',
-  } as any) as any;
-  const messages = useMemo(() => chatState.messages || [], [chatState.messages]);
-  const sendMessage = chatState.sendMessage || chatState.append;
-  const append = chatState.append || chatState.sendMessage;
-  const isLoading = chatState.status === 'submitted' || chatState.status === 'streaming' || chatState.isLoading;
-  const [input, setInput] = useState("");
-  
-  const [isExpanded, setIsExpanded] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
-
-  const prompts = useMemo(
-    () => [
-      "Which project proves AI product thinking?",
-      "Summarize Kapil for a startup role.",
-      "Show backend and frontend strengths."
-    ],
-    []
-  );
+  const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
   return (
-    <>
-      <motion.div
-        className="glass rounded-lg p-4 cursor-pointer relative overflow-hidden group"
-        whileHover={{ y: -4 }}
-        transition={{ type: "spring", stiffness: 260, damping: 24 }}
-        onClick={() => !isExpanded && setIsExpanded(true)}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="grid size-9 place-items-center rounded-md bg-cyan-300/15 text-cyan-200">
-              <Bot size={18} />
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-white">Kapil AI Brief</p>
-              <p className="text-xs text-slate-400">Portfolio assistant</p>
-            </div>
+    <motion.div
+      className="glass rounded-lg p-4 relative overflow-hidden"
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 260, damping: 24 }}
+    >
+      {/* Header */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="grid size-9 place-items-center rounded-md bg-cyan-300/15 text-cyan-200">
+            <Bot size={18} />
+          </span>
+          <div>
+            <p className="text-sm font-semibold text-white">Kapil AI Brief</p>
+            <p className="text-xs text-slate-400">Quick answers</p>
           </div>
-          <span className="rounded-md bg-emerald-300/15 px-2 py-1 text-xs font-semibold text-emerald-200">online</span>
         </div>
-        {!isExpanded && (
-          <div className="space-y-2">
-            {prompts.map((prompt) => (
-              <motion.button
-                key={prompt}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsExpanded(true);
-                  append({ role: 'user', content: prompt });
-                }}
-                whileHover={{ x: 5 }}
-                whileTap={{ scale: 0.985 }}
-                className="w-full rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-xs text-slate-300 transition hover:border-white/20"
-              >
-                {prompt}
-              </motion.button>
-            ))}
-            <div className="mt-4 flex items-center justify-center gap-2 rounded-md border border-cyan-500/30 bg-cyan-500/10 p-3 text-sm text-cyan-100 transition group-hover:bg-cyan-500/20">
-              <Sparkles size={16} />
-              <span>Click to chat with AI</span>
-            </div>
-          </div>
-        )}
-      </motion.div>
+        <span className="rounded-md bg-emerald-300/15 px-2 py-1 text-xs font-semibold text-emerald-200">FAQ</span>
+      </div>
 
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-            onClick={() => setIsExpanded(false)}
-          >
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="glass relative flex flex-col w-full max-w-lg h-[80vh] max-h-[650px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-cyan-900/20"
-              onClick={(e) => e.stopPropagation()}
+      {/* FAQ Items */}
+      <div className="space-y-2">
+        {kapilFaqData.map((item, i) => (
+          <div key={i} className="rounded-lg border border-white/10 bg-white/[0.03] overflow-hidden">
+            <motion.button
+              onClick={() => toggle(i)}
+              className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-left text-xs text-slate-300 hover:text-white transition"
+              whileTap={{ scale: 0.985 }}
             >
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-white/10 bg-white/5 p-4 backdrop-blur-md">
-                <div className="flex items-center gap-3">
-                  <span className="grid size-10 place-items-center rounded-lg bg-cyan-300/15 text-cyan-200">
-                    <Bot size={20} />
-                  </span>
-                  <div>
-                    <h3 className="font-semibold text-white">Kapil AI</h3>
-                    <p className="text-xs text-emerald-300 flex items-center gap-1">
-                      <span className="relative flex size-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
-                      </span>
-                      Active now
-                    </p>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setIsExpanded(false)}
-                  className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition"
-                >
-                  <X size={20} />
-                </button>
-              </div>
+              <span className="flex items-center gap-2">
+                <MessageCircleQuestion size={14} className="text-cyan-300 shrink-0" />
+                {item.question}
+              </span>
+              <motion.span
+                animate={{ rotate: openIndex === i ? 180 : 0 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="shrink-0 text-slate-500"
+              >
+                <ChevronDown size={14} />
+              </motion.span>
+            </motion.button>
 
-              {/* Messages Area */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col custom-scrollbar">
-                {messages.length === 0 ? (
-                  <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 opacity-70 my-8">
-                    <div className="grid size-16 place-items-center rounded-full bg-white/5">
-                      <Bot size={32} className="text-cyan-200" />
-                    </div>
-                    <p className="text-sm text-slate-300 max-w-[250px] leading-relaxed">
-                      Hi! I&apos;m Kapil&apos;s AI assistant. Ask me anything about his projects, tech stack, or experience.
-                    </p>
-                    <div className="flex flex-col gap-2 w-full max-w-xs mt-6">
-                      {prompts.map(p => (
-                        <button 
-                          key={p}
-                          onClick={() => sendMessage({ role: 'user', content: p })}
-                          className="text-xs text-left px-3 py-2.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 transition"
-                        >
-                          {p}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  messages.map((m: any) => (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      key={m.id} 
-                      className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap ${
-                        m.role === 'user' 
-                          ? 'bg-cyan-600/90 text-white rounded-tr-sm' 
-                          : 'bg-white/10 text-slate-200 rounded-tl-sm border border-white/5'
-                      }`}>
-                        {m.content}
-                      </div>
-                    </motion.div>
-                  ))
-                )}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-white/10 rounded-2xl rounded-tl-sm px-4 py-3.5 border border-white/5 flex gap-1 items-center">
-                      <motion.div className="w-1.5 h-1.5 bg-cyan-200 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} />
-                      <motion.div className="w-1.5 h-1.5 bg-cyan-200 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
-                      <motion.div className="w-1.5 h-1.5 bg-cyan-200 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input Area */}
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                if (!input.trim() || isLoading) return;
-                sendMessage({ role: 'user', content: input });
-                setInput("");
-              }} className="border-t border-white/10 bg-black/20 p-4 flex gap-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about Kapil..."
-                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[15px] text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
-                />
-                <button 
-                  type="submit" 
-                  disabled={isLoading || !input.trim()}
-                  className="grid place-items-center bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-xl px-4 transition"
+            <AnimatePresence initial={false}>
+              {openIndex === i && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="overflow-hidden"
                 >
-                  {isLoading ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
-                </button>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+                  <div className="px-3 pb-3 pt-1 text-xs leading-relaxed text-slate-400 border-t border-white/5">
+                    {item.answer}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ))}
+      </div>
+    </motion.div>
   );
 }
 

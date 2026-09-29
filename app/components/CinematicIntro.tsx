@@ -3,34 +3,12 @@
 import { gsap } from "gsap";
 import { useCallback, useEffect, useRef } from "react";
 
-/* ─── Language sequence ─── */
-const titles = [
-  { lang: "English", text: "Kapil Kurchaniya" },
-  { lang: "हिन्दी", text: "कपिल कुर्चानिया" },
-  { lang: "संस्कृत", text: "कपिल कुर्चानियः" },
-  { lang: "తెలుగు", text: "కపిల్ కుర్చానియా" },
-  { lang: "ಕನ್ನಡ", text: "ಕಪಿಲ್ ಕುರ್ಚಾನಿಯಾ" },
-  { lang: "日本語", text: "カピル・クルチャニヤ" },
-];
+/* 
+  Authentic Apple Mac 'Hello' effect.
+  Path is designed to be drawn using stroke-dashoffset.
+*/
+const HELLO_PATH = "M 151.54 259.66 C 219.34,206.68 190.47,237.58 219.34,206.68 C 241.57,182.89 253.21,150.90 244.29,137.12 C 211.83,87.01 192.50,269.63 197.21,269.66 C 201.92,269.68 201.65,216.50 225.54,204.44 C 249.42,192.38 257.84,208.44 258.94,215.94 C 260.71,228.04 253.50,247.22 254.71,254.20 C 259.78,283.42 342.30,254.73 348.79,221.59 C 355.77,185.97 294.64,187.67 306.72,244.59 C 311.16,265.51 338.77,270.90 353.44,267.77 C 406.50,256.46 442.90,198.68 441.60,154.30 C 439.90,96.81 382.85,154.92 396.57,243.46 C 401.86,277.57 446.73,266.48 459.99,257.40 C 484.51,240.63 527.73,192.24 519.82,145.26 C 511.58,96.25 449.45,177.00 477.96,250.43 C 487.47,274.93 516.02,266.64 523.84,262.87 C 542.42,253.92 548.40,221.44 563.79,207.27 C 583.25,189.36 613.90,202.74 615.17,224.04 C 617.97,270.97 577.27,271.00 562.10,260.42 C 549.02,251.29 545.95,224.09 563.58,207.27 C 575.63,195.77 594.90,195.48 620.24,208.40 C 630.60,213.68 639.48,212.73 646.46,204.25";
 
-const FINALE_TEXT = "KAPIL KURCHANIYA";
-
-/* Safe grapheme splitter for the finale character stagger */
-function splitGraphemes(text: string): string[] {
-  try {
-    const segmenter = new Intl.Segmenter(undefined, {
-      granularity: "grapheme",
-    });
-    return [...segmenter.segment(text)].map((s) => s.segment);
-  } catch {
-    return Array.from(text);
-  }
-}
-
-/* ─────────────────────────────────────────────────────
-   CinematicIntro
-   Apple-keynote-style title reveal with GSAP timeline.
-   ───────────────────────────────────────────────────── */
 export function CinematicIntro({
   onComplete,
 }: {
@@ -60,291 +38,141 @@ export function CinematicIntro({
       // Ignore fallback
     }
 
-    /* Respect reduced-motion */
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       done();
       return;
     }
 
     const ctx = gsap.context(() => {
-      /* ── Selectors ── */
       const dot = ".ci-dot";
-      const camera = ".ci-camera";
-      const titleGroups = gsap.utils.toArray<HTMLElement>(".ci-title");
-      const finaleGroup = ".ci-finale";
-      const finaleChars = gsap.utils.toArray<HTMLElement>(".ci-fchar");
-      const finaleGlow = ".ci-finale-glow";
-
-      /* ── Initial state: everything hidden ── */
-      gsap.set(titleGroups, { autoAlpha: 0 });
-      gsap.set(finaleGroup, { autoAlpha: 0 });
+      const helloPath = root.querySelector(".ci-hello-path") as SVGPathElement;
+      
       gsap.set(dot, { scale: 0, opacity: 0 });
-      gsap.set(finaleChars, { opacity: 0, y: 5, scale: 0.96 });
-      gsap.set(finaleGlow, { opacity: 0, scale: 0.7 });
 
-      /* ── Build the master timeline ── */
+      // Initialize Hello SVG path to be perfectly hidden via stroke-dashoffset
+      // We calculate exact length for perfect animation
+      let helloLength = 2000;
+      if (helloPath) {
+        helloLength = helloPath.getTotalLength();
+        gsap.set(helloPath, {
+          strokeDasharray: helloLength,
+          strokeDashoffset: helloLength,
+          opacity: 1 // Ensure the group/path is visible for drawing
+        });
+      }
+
       const tl = gsap.timeline({
         onComplete: done,
         defaults: { overwrite: "auto" },
       });
 
-      /* ═══ Phase 1: Dot breathes in (ultra-fast & crisp) ═══ */
-      tl.to(dot, {
-        opacity: 1,
-        scale: 1,
-        duration: 0.25,
-        ease: "power2.out",
-      });
+      // 1. Dot appears
+      tl.to(dot, { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" });
+      tl.to(dot, { opacity: 0, scale: 4, duration: 0.3, ease: "power3.out" }, "+=0.1");
 
-      /* ═══ Phase 2: Dot expands into sequence ═══ */
-      tl.to(
-        dot,
-        {
-          opacity: 0,
-          scale: 8,
-          duration: 0.25,
-          ease: "power3.out",
-        },
-        "+=0.05"
-      );
-
-      /* Camera push-in */
-      tl.to(
-        camera,
-        {
-          scale: 1.015,
-          duration: 3.5,
-          ease: "none",
-        },
-        "-=0.25"
-      );
-
-      /* ═══ Phase 3: Ultra-fast language sequence (zero delay) ═══ */
-      titleGroups.forEach((group, i) => {
-        const text = group.querySelector<HTMLElement>(".ci-text")!;
-        const label = group.querySelector<HTMLElement>(".ci-label")!;
-        const sweep = group.querySelector<HTMLElement>(".ci-sweep")!;
-
-        if (i === 0) {
-          const tLabel = `title0`;
-          tl.addLabel(tLabel, "-=0.15");
-          tl.set(group, { autoAlpha: 1 }, tLabel);
-
-          tl.fromTo(
-            text,
-            { opacity: 0, y: 6, filter: "blur(4px)", scale: 0.99 },
-            {
-              opacity: 1,
-              y: 0,
-              filter: "blur(0.01px)",
-              scale: 1,
-              duration: 0.22,
-              ease: "power2.out",
-            },
-            tLabel
-          );
-
-          tl.fromTo(
-            label,
-            { opacity: 0, y: 3 },
-            { opacity: 0.5, y: 0, duration: 0.18, ease: "power2.out" },
-            tLabel
-          );
-
-          tl.fromTo(
-            sweep,
-            { xPercent: -120 },
-            { xPercent: 120, duration: 0.45, ease: "power1.inOut" },
-            tLabel
-          );
-
-          /* Hold for 0.2s */
-          tl.to({}, { duration: 0.2 });
-        } else {
-          const prev = titleGroups[i - 1];
-          const prevText = prev.querySelector<HTMLElement>(".ci-text")!;
-          const prevLabel = prev.querySelector<HTMLElement>(".ci-label")!;
-
-          const stepLabel = `step${i}`;
-          tl.addLabel(stepLabel);
-
-          /* 1. Outgoing language disappears fast */
-          tl.to(
-            [prevText, prevLabel],
-            {
-              opacity: 0,
-              y: -6,
-              filter: "blur(3px)",
-              duration: 0.12,
-              ease: "power2.in",
-            },
-            stepLabel
-          );
-
-          tl.set(prev, { autoAlpha: 0 });
-
-          /* 2. Incoming language rises instantly with zero delay */
-          tl.set(group, { autoAlpha: 1 });
-
-          tl.fromTo(
-            text,
-            { opacity: 0, y: 6, filter: "blur(4px)", scale: 0.99 },
-            {
-              opacity: 1,
-              y: 0,
-              filter: "blur(0.01px)",
-              scale: 1,
-              duration: 0.2,
-              ease: "power2.out",
-            }
-          );
-
-          tl.fromTo(
-            label,
-            { opacity: 0, y: 3 },
-            { opacity: 0.5, y: 0, duration: 0.15, ease: "power2.out" },
-            "-=0.18"
-          );
-
-          tl.fromTo(
-            sweep,
-            { xPercent: -120 },
-            { xPercent: 120, duration: 0.4, ease: "power1.inOut" },
-            "-=0.15"
-          );
-
-          /* Hold for 0.2s */
-          tl.to({}, { duration: 0.2 });
-        }
-      });
-
-      /* ═══ Outgoing last language ═══ */
-      const last = titleGroups[titleGroups.length - 1];
-      const lastText = last.querySelector<HTMLElement>(".ci-text")!;
-      const lastLabel = last.querySelector<HTMLElement>(".ci-label")!;
-
-      tl.to([lastText, lastLabel], {
-        opacity: 0,
-        y: -6,
-        filter: "blur(3px)",
-        duration: 0.12,
-        ease: "power2.in",
-      });
-      tl.set(last, { autoAlpha: 0 });
-
-      /* ═══ Phase 4: Quick Convergence Dot ═══ */
-      tl.fromTo(
-        dot,
-        { opacity: 0, scale: 0 },
-        { opacity: 1, scale: 0.8, duration: 0.18, ease: "power2.out" }
-      );
-
-      tl.to(dot, {
-        opacity: 0,
-        scale: 0,
-        duration: 0.15,
-        ease: "power2.in",
-      });
-
-      /* ═══ Phase 5: Finale — "KAPIL KURCHANIYA" ═══ */
-      tl.addLabel("finale");
-      tl.set(finaleGroup, { autoAlpha: 1 }, "finale");
-
-      tl.to(
-        finaleGlow,
-        { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" },
-        "finale"
-      );
-
-      tl.to(
-        finaleChars,
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.35,
-          stagger: { each: 0.015, ease: "power1.out" },
-          ease: "power3.out",
-        },
-        "finale"
-      );
-
-      const fSweep = root.querySelector<HTMLElement>(".ci-finale .ci-sweep");
-      if (fSweep) {
+      // 2. Draw "hello"
+      if (helloPath) {
         tl.fromTo(
-          fSweep,
-          { xPercent: -120 },
-          { xPercent: 120, duration: 0.8, ease: "power1.inOut" },
-          "finale"
+          helloPath,
+          { strokeDashoffset: helloLength },
+          {
+            strokeDashoffset: 0,
+            duration: 2.2, // Elegant Apple speed
+            ease: "power2.inOut",
+          }
         );
       }
 
-      /* Hold finale for 0.35s */
-      tl.addLabel("finaleHold", "+=0.35");
+      // 3. Fade out Hello
+      tl.to(".ci-hello-group", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, "+=0.8");
 
-      /* ═══ Phase 6: Fast Exit to Portfolio (Split Animation) ═══ */
-      tl.to(
-        [camera, ".ci-skip"],
-        { opacity: 0, duration: 0.3, ease: "power2.inOut" },
-        "finaleHold"
+      // 4. Draw "Namaste" outline
+      tl.set(".ci-namaste-group", { opacity: 1 });
+      tl.fromTo(".ci-namaste-text",
+        { strokeDashoffset: 1000 },
+        { strokeDashoffset: 0, duration: 2.5, ease: "power2.inOut" }
       );
+      
+      // 5. Fill in "Namaste" smoothly
+      tl.to(".ci-namaste-text", { fill: "url(#apple-gradient)", duration: 0.8, ease: "power2.out" }, "-=0.5");
 
-      tl.to(
-        ".ci-bg-top",
-        { yPercent: -100, duration: 1.2, ease: "power4.inOut" },
-        "finaleHold+=0.2"
-      );
+      // 6. Hold for a moment
+      tl.to({}, { duration: 1.0 });
 
-      tl.to(
-        ".ci-bg-bottom",
-        { yPercent: 100, duration: 1.2, ease: "power4.inOut" },
-        "finaleHold+=0.2"
-      );
-
+      // 7. Screen splits open (Mac style)
+      tl.addLabel("split");
+      tl.to(".ci-bg-top", { yPercent: -100, duration: 1.2, ease: "power4.inOut" }, "split");
+      tl.to(".ci-bg-bottom", { yPercent: 100, duration: 1.2, ease: "power4.inOut" }, "split");
+      tl.to([".ci-camera", ".ci-skip"], { opacity: 0, duration: 0.4, ease: "power2.in" }, "split");
+      
       tl.set(root, { autoAlpha: 0 });
     }, root);
 
     return () => ctx.revert();
   }, [done]);
 
-  const finaleGraphemes = splitGraphemes(FINALE_TEXT);
-
   return (
     <div ref={containerRef} className="ci-container" aria-hidden="true">
-      <div className="ci-bg-top" />
-      <div className="ci-bg-bottom" />
+      {/* Pure black background, split into top and bottom for the reveal */}
+      <div className="ci-bg-top" style={{ backgroundColor: "#000" }} />
+      <div className="ci-bg-bottom" style={{ backgroundColor: "#000" }} />
       
-      {/* ── Cyan dot ── */}
       <div className="ci-dot" />
 
-      {/* ── Camera wrapper (subtle push-in) ── */}
       <div className="ci-camera">
-        {/* ── Stacked language titles ── */}
-        {titles.map((title, i) => (
-          <div key={i} className="ci-title">
-            <p className="ci-label">{title.lang}</p>
-            <div className="ci-text-wrap">
-              <p className="ci-text">{title.text}</p>
-              <div className="ci-sweep" aria-hidden="true" />
-            </div>
-          </div>
-        ))}
+        <svg 
+          className="ci-svg-container"
+          viewBox="0 0 800 400"
+          preserveAspectRatio="xMidYMid meet"
+          style={{ width: '100%', height: '100%', maxWidth: '800px' }}
+        >
+          {/* Apply a subtle warm gradient to the stroke, like Apple */}
+          <defs>
+            <linearGradient id="apple-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#ffffff" />
+              <stop offset="50%" stopColor="#f5f5f7" />
+              <stop offset="100%" stopColor="#e5e5ea" />
+            </linearGradient>
+          </defs>
 
-        {/* ── Finale ── */}
-        <div className="ci-finale">
-          <p className="ci-finale-text">
-            {finaleGraphemes.map((char, i) => (
-              <span key={i} className="ci-fchar">
-                {char === " " ? "\u00A0" : char}
-              </span>
-            ))}
-          </p>
-          <div className="ci-finale-glow" aria-hidden="true" />
-          <div className="ci-sweep" aria-hidden="true" />
-        </div>
+          {/* Hello Group */}
+          <g className="ci-hello-group">
+            <path
+              className="ci-hello-path"
+              d={HELLO_PATH}
+              fill="none"
+              stroke="url(#apple-gradient)"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              transform="translate(0, -50)"
+              /* Fix FOUC: Initially hide the path using a large dashoffset */
+              style={{ strokeDasharray: 2000, strokeDashoffset: 2000, opacity: 0 }}
+            />
+          </g>
+
+          {/* Namaste Group */}
+          <g className="ci-namaste-group" style={{ opacity: 0 }}>
+            <text
+              className="ci-namaste-text"
+              x="400"
+              y="220"
+              textAnchor="middle"
+              fill="transparent"
+              stroke="url(#apple-gradient)"
+              strokeWidth="1.5"
+              fontSize="80"
+              fontWeight="300"
+              fontFamily='system-ui, -apple-system, "Noto Sans Devanagari", sans-serif'
+              /* Fix FOUC for outline drawing */
+              style={{ strokeDasharray: 1000, strokeDashoffset: 1000 }}
+            >
+              नमस्ते
+            </text>
+          </g>
+        </svg>
       </div>
 
-      {/* ── Skip ── */}
       <button className="ci-skip" onClick={done} aria-label="Skip intro">
         Skip
       </button>
