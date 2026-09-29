@@ -29,6 +29,7 @@ import {
   X,
   Zap
 } from "lucide-react";
+import { useChat } from "@ai-sdk/react";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -91,6 +92,7 @@ const projects: Project[] = [
     summary:
       "A comprehensive Hospital Management System for Govt. Civil Hospital, Gadarwara. Built to streamline OPD management, digitize patient records, and provide a secure admin portal for hospital staff.",
     stack: ["React", "TypeScript", "Tailwind", "Node.js"],
+    href: "https://govt-hospitall-gadarwara.vercel.app/login",
     preview: "/previews/hospital-management.png",
     accent: "from-teal-300 via-emerald-300 to-blue-400",
     metric: "Healthcare software",
@@ -631,6 +633,24 @@ function ProjectCard({ project, index, onClick }: { project: Project; index: num
 /* ───────── Live project card with scroll-through hover ───────── */
 /* ───────── AI Assistant ───────── */
 function AIAssistant() {
+  const chatState = useChat({
+    api: '/api/chat',
+  } as any) as any;
+  const messages = chatState.messages || [];
+  const sendMessage = chatState.sendMessage || chatState.append;
+  const append = chatState.append || chatState.sendMessage;
+  const isLoading = chatState.status === 'submitted' || chatState.status === 'streaming' || chatState.isLoading;
+  const [input, setInput] = useState("");
+  
+  const [isExpanded, setIsExpanded] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
   const prompts = useMemo(
     () => [
       "Which project proves AI product thinking?",
@@ -639,59 +659,173 @@ function AIAssistant() {
     ],
     []
   );
-  const [active, setActive] = useState(0);
-
-  const replies = [
-    "CURORA AI, FRIDAY THE ASSISTANT, and KRISHI MITRA are the strongest AI-product signals: healthcare safety workflows, voice assistant routing, agriculture context, responsive flows, and clear product stories.",
-    "Kapil is an AI-focused full stack builder who ships React + Node products with interface discipline and practical product instincts.",
-    "Frontend: TypeScript, React, Tailwind, Framer Motion, GSAP. Backend: Node, Express, REST APIs, MongoDB, Firebase."
-  ];
 
   return (
-    <motion.div
-      className="glass rounded-lg p-4"
-      whileHover={{ y: -4 }}
-      transition={{ type: "spring", stiffness: 260, damping: 24 }}
-    >
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="grid size-9 place-items-center rounded-md bg-cyan-300/15 text-cyan-200">
-            <Bot size={18} />
-          </span>
-          <div>
-            <p className="text-sm font-semibold text-white">Kapil AI Brief</p>
-            <p className="text-xs text-slate-400">Portfolio assistant</p>
-          </div>
-        </div>
-        <span className="rounded-md bg-emerald-300/15 px-2 py-1 text-xs font-semibold text-emerald-200">online</span>
-      </div>
-      <div className="space-y-2">
-        {prompts.map((prompt, index) => (
-          <motion.button
-            key={prompt}
-            onClick={() => setActive(index)}
-            whileHover={{ x: 5 }}
-            whileTap={{ scale: 0.985 }}
-            className={`w-full rounded-md border px-3 py-2 text-left text-xs transition ${
-              active === index
-                ? "border-cyan-200/60 bg-cyan-200/10 text-cyan-50"
-                : "border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/20"
-            }`}
-          >
-            {prompt}
-          </motion.button>
-        ))}
-      </div>
+    <>
       <motion.div
-        key={active}
-        initial={{ opacity: 0, y: 12, filter: "blur(8px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0.01px)" }}
-        transition={{ duration: 0.38, ease: smoothEase }}
-        className="mt-4 rounded-md border border-white/10 bg-slate-950/60 p-3 text-sm leading-6 text-slate-200"
+        className="glass rounded-lg p-4 cursor-pointer relative overflow-hidden group"
+        whileHover={{ y: -4 }}
+        transition={{ type: "spring", stiffness: 260, damping: 24 }}
+        onClick={() => !isExpanded && setIsExpanded(true)}
       >
-        {replies[active]}
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="grid size-9 place-items-center rounded-md bg-cyan-300/15 text-cyan-200">
+              <Bot size={18} />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-white">Kapil AI Brief</p>
+              <p className="text-xs text-slate-400">Portfolio assistant</p>
+            </div>
+          </div>
+          <span className="rounded-md bg-emerald-300/15 px-2 py-1 text-xs font-semibold text-emerald-200">online</span>
+        </div>
+        {!isExpanded && (
+          <div className="space-y-2">
+            {prompts.map((prompt) => (
+              <motion.button
+                key={prompt}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsExpanded(true);
+                  append({ role: 'user', content: prompt });
+                }}
+                whileHover={{ x: 5 }}
+                whileTap={{ scale: 0.985 }}
+                className="w-full rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-xs text-slate-300 transition hover:border-white/20"
+              >
+                {prompt}
+              </motion.button>
+            ))}
+            <div className="mt-4 flex items-center justify-center gap-2 rounded-md border border-cyan-500/30 bg-cyan-500/10 p-3 text-sm text-cyan-100 transition group-hover:bg-cyan-500/20">
+              <Sparkles size={16} />
+              <span>Click to chat with AI</span>
+            </div>
+          </div>
+        )}
       </motion.div>
-    </motion.div>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsExpanded(false)}
+          >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="glass relative flex flex-col w-full max-w-lg h-[80vh] max-h-[650px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-cyan-900/20"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-white/10 bg-white/5 p-4 backdrop-blur-md">
+                <div className="flex items-center gap-3">
+                  <span className="grid size-10 place-items-center rounded-lg bg-cyan-300/15 text-cyan-200">
+                    <Bot size={20} />
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-white">Kapil AI</h3>
+                    <p className="text-xs text-emerald-300 flex items-center gap-1">
+                      <span className="relative flex size-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
+                      </span>
+                      Active now
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsExpanded(false)}
+                  className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Messages Area */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col custom-scrollbar">
+                {messages.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 opacity-70 my-8">
+                    <div className="grid size-16 place-items-center rounded-full bg-white/5">
+                      <Bot size={32} className="text-cyan-200" />
+                    </div>
+                    <p className="text-sm text-slate-300 max-w-[250px] leading-relaxed">
+                      Hi! I'm Kapil's AI assistant. Ask me anything about his projects, tech stack, or experience.
+                    </p>
+                    <div className="flex flex-col gap-2 w-full max-w-xs mt-6">
+                      {prompts.map(p => (
+                        <button 
+                          key={p}
+                          onClick={() => sendMessage({ role: 'user', content: p })}
+                          className="text-xs text-left px-3 py-2.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 transition"
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  messages.map((m: any) => (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      key={m.id} 
+                      className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap ${
+                        m.role === 'user' 
+                          ? 'bg-cyan-600/90 text-white rounded-tr-sm' 
+                          : 'bg-white/10 text-slate-200 rounded-tl-sm border border-white/5'
+                      }`}>
+                        {m.content}
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-white/10 rounded-2xl rounded-tl-sm px-4 py-3.5 border border-white/5 flex gap-1 items-center">
+                      <motion.div className="w-1.5 h-1.5 bg-cyan-200 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} />
+                      <motion.div className="w-1.5 h-1.5 bg-cyan-200 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
+                      <motion.div className="w-1.5 h-1.5 bg-cyan-200 rounded-full" animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input Area */}
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                if (!input.trim() || isLoading) return;
+                sendMessage({ role: 'user', content: input });
+                setInput("");
+              }} className="border-t border-white/10 bg-black/20 p-4 flex gap-2">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask about Kapil..."
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[15px] text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
+                />
+                <button 
+                  type="submit" 
+                  disabled={isLoading || !input.trim()}
+                  className="grid place-items-center bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-xl px-4 transition"
+                >
+                  {isLoading ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
+                </button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
