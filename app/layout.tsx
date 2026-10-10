@@ -81,6 +81,7 @@ export const metadata: Metadata = {
 };
 
 import { CustomCursor } from "./components/CustomCursor";
+import { OfflineScreen } from "./components/OfflineScreen";
 
 export default function RootLayout({
   children
@@ -143,6 +144,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} antialiased`}>
         <CustomCursor />
+        <OfflineScreen />
         {children}
       </body>
     </html>
