@@ -99,7 +99,7 @@ export function CustomCursor() {
     <>
       {/* Main cursor — simple circle, no spring/magnetic */}
       <div
-        className="pointer-events-none fixed left-0 top-0 z-[9999] flex items-center justify-center rounded-full border"
+        className="pointer-events-none fixed left-0 top-0 z-[100002] flex items-center justify-center rounded-full border"
         style={{
           width: size,
           height: size,
@@ -147,7 +147,7 @@ export function CustomCursor() {
             animate={{ scale: 2.5, opacity: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.55, ease: "easeOut" }}
-            className="pointer-events-none fixed z-[9998] rounded-full border border-cyan-300/40"
+            className="pointer-events-none fixed z-[100001] rounded-full border border-cyan-300/40"
             style={{
               left: ripple.x - 20,
               top: ripple.y - 20,

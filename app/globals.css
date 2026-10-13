@@ -553,15 +553,94 @@ html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: #050713;
-  overflow: hidden;
-  cursor: default;
+  overflow-y: auto;
+  overflow-x: hidden;
+  cursor: default !important;
+  padding: clamp(20px, 4vh, 48px) 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom sleek scrollbar for laptop/desktop */
+.offline-overlay::-webkit-scrollbar {
+  width: 6px;
+}
+.offline-overlay::-webkit-scrollbar-track {
+  background: transparent;
+}
+.offline-overlay::-webkit-scrollbar-thumb {
+  background: rgba(103, 232, 249, 0.2);
+  border-radius: 999px;
+}
+.offline-overlay::-webkit-scrollbar-thumb:hover {
+  background: rgba(103, 232, 249, 0.45);
+}
+
+/* Force visible pointer on clickable elements inside offline screen */
+.offline-overlay button,
+.offline-retry-btn,
+.offline-preview-close {
+  cursor: pointer !important;
+}
+
+/* ── Preview Mode Banner ── */
+.offline-preview-banner {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(103, 232, 249, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: rgba(248, 251, 255, 0.9);
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+.offline-preview-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  transition: all 0.2s ease;
+}
+
+.offline-preview-close:hover {
+  background: rgba(244, 63, 94, 0.25);
+  border-color: rgba(244, 63, 94, 0.4);
+  color: #f43f5e;
+}
+
+/* ── Content Wrapper (Centered with safe margins) ── */
+.offline-content-wrapper {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 660px;
+  margin: auto 0;
+  padding: 12px 0;
 }
 
 /* ── Animated background orbs ── */
 .offline-bg-orb {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   filter: blur(100px);
   pointer-events: none;
@@ -604,7 +683,7 @@ html {
 
 /* ── Grid overlay ── */
 .offline-grid-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
@@ -615,32 +694,15 @@ html {
   pointer-events: none;
 }
 
-/* ── Floating particles ── */
-.offline-particle {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(103, 232, 249, 0.4);
-  pointer-events: none;
-  animation: offline-particle-drift ease-in-out infinite;
-}
-
-@keyframes offline-particle-drift {
-  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.15; }
-  25% { transform: translateY(-25px) translateX(10px); opacity: 0.45; }
-  50% { transform: translateY(-40px) translateX(-8px); opacity: 0.25; }
-  75% { transform: translateY(-18px) translateX(14px); opacity: 0.4; }
-}
-
 /* ── Content container ── */
 .offline-content {
   position: relative;
-  z-index: 2;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  max-width: 480px;
-  padding: 0 24px;
+  gap: 20px;
+  padding: 0 16px;
   text-align: center;
 }
 
@@ -650,17 +712,17 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 140px;
-  height: 140px;
-  margin-bottom: 8px;
+  width: 130px;
+  height: 130px;
+  margin-bottom: 4px;
 }
 
 .offline-wifi-icon {
-  width: 88px;
-  height: 88px;
+  width: 82px;
+  height: 82px;
   position: relative;
   z-index: 2;
-  filter: drop-shadow(0 0 20px rgba(103, 232, 249, 0.3));
+  filter: drop-shadow(0 0 20px rgba(103, 232, 249, 0.35));
 }
 
 /* ── Pulse rings behind icon ── */
@@ -730,7 +792,7 @@ html {
 /* ── Title ── */
 .offline-title {
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(2rem, 6vw, 3.2rem);
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.15;
@@ -755,21 +817,29 @@ html {
 /* ── Description ── */
 .offline-description {
   font-size: 15px;
-  line-height: 1.65;
-  color: rgba(248, 251, 255, 0.5);
+  line-height: 1.6;
+  color: rgba(248, 251, 255, 0.55);
   margin: 0;
-  max-width: 380px;
+  max-width: 460px;
 }
 
-/* ── Retry button ── */
+/* ── Actions (Retry button & Keyboard pill) ── */
+.offline-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
 .offline-retry-btn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 13px 32px;
-  border: 1px solid rgba(103, 232, 249, 0.25);
+  padding: 12px 30px;
+  border: 1px solid rgba(103, 232, 249, 0.3);
   border-radius: 12px;
-  background: linear-gradient(145deg, rgba(103, 232, 249, 0.12), rgba(103, 232, 249, 0.04));
+  background: linear-gradient(145deg, rgba(103, 232, 249, 0.14), rgba(103, 232, 249, 0.05));
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: rgb(103, 232, 249);
@@ -777,25 +847,29 @@ html {
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  cursor: pointer;
+  cursor: pointer !important;
   transition: all 0.3s ease;
-  margin-top: 4px;
 }
 
 .offline-retry-btn:hover {
-  border-color: rgba(103, 232, 249, 0.45);
-  background: linear-gradient(145deg, rgba(103, 232, 249, 0.18), rgba(103, 232, 249, 0.07));
-  box-shadow: 0 0 30px rgba(103, 232, 249, 0.12), 0 0 60px rgba(103, 232, 249, 0.05);
+  border-color: rgba(103, 232, 249, 0.55);
+  background: linear-gradient(145deg, rgba(103, 232, 249, 0.22), rgba(103, 232, 249, 0.08));
+  box-shadow: 0 0 25px rgba(103, 232, 249, 0.2), 0 0 50px rgba(103, 232, 249, 0.08);
+}
+
+.offline-retry-btn:focus-visible {
+  outline: 2px solid rgba(103, 232, 249, 0.7);
+  outline-offset: 3px;
 }
 
 .offline-retry-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
+  opacity: 0.6;
+  cursor: not-allowed !important;
 }
 
 .offline-retry-icon {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   flex-shrink: 0;
 }
 
@@ -808,54 +882,133 @@ html {
   to { transform: rotate(360deg); }
 }
 
-/* ── Diagnostic hints ── */
+/* ── Keyboard & Auto-retry Hint Pill ── */
+.offline-keyboard-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(248, 251, 255, 0.45);
+  letter-spacing: 0.02em;
+}
+
+.offline-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(103, 232, 249, 0.25);
+  color: rgb(103, 232, 249);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.offline-kbd-sep {
+  opacity: 0.35;
+  margin: 0 2px;
+}
+
+.offline-auto-retry-text {
+  color: rgba(103, 232, 249, 0.65);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Diagnostic telemetry cards (3-columns on desktop) ── */
 .offline-hints {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
   width: 100%;
-  max-width: 320px;
+  max-width: 620px;
+  margin-top: 4px;
+}
+
+@media (max-width: 640px) {
+  .offline-hints {
+    grid-template-columns: 1fr;
+    max-width: 340px;
+  }
 }
 
 .offline-hint-item {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.03);
-  font-size: 13px;
-  color: rgba(248, 251, 255, 0.45);
-  transition: border-color 0.25s ease, background 0.25s ease;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  text-align: left;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+}
+
+@media (max-width: 640px) {
+  .offline-hint-item {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
 }
 
 .offline-hint-item:hover {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(103, 232, 249, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px);
 }
 
-.offline-hint-icon {
-  font-size: 16px;
+.offline-hint-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
 }
 
-/* ── Bottom branding ── */
+.offline-hint-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.offline-hint-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(248, 251, 255, 0.85);
+  letter-spacing: 0.01em;
+}
+
+.offline-hint-desc {
+  font-size: 11px;
+  color: rgba(248, 251, 255, 0.45);
+  line-height: 1.35;
+}
+
+/* ── Bottom branding (Inline flow) ── */
 .offline-branding {
-  position: absolute;
-  bottom: 32px;
-  z-index: 2;
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 14px;
   font-size: 12px;
   letter-spacing: 0.06em;
-  color: rgba(248, 251, 255, 0.2);
+  color: rgba(248, 251, 255, 0.25);
 }
 
 .offline-branding-name {
-  color: rgba(103, 232, 249, 0.35);
+  color: rgba(103, 232, 249, 0.4);
   font-weight: 500;
 }
 
@@ -867,43 +1020,89 @@ html {
   font-style: italic;
 }
 
-/* ── Responsive ── */
+/* ── Laptop Responsive Optimization (height <= 760px) ── */
+@media (max-height: 760px) {
+  .offline-overlay {
+    padding: 16px 16px;
+  }
+  .offline-icon-wrapper {
+    width: 96px;
+    height: 96px;
+    margin-bottom: 0px;
+  }
+  .offline-wifi-icon {
+    width: 60px;
+    height: 60px;
+  }
+  .offline-content {
+    gap: 14px;
+  }
+  .offline-title {
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  }
+  .offline-description {
+    font-size: 13px;
+    line-height: 1.45;
+    max-width: 440px;
+  }
+  .offline-retry-btn {
+    padding: 10px 24px;
+    font-size: 13px;
+  }
+  .offline-hints {
+    gap: 8px;
+  }
+  .offline-hint-item {
+    padding: 8px 10px;
+  }
+  .offline-hint-icon-box {
+    width: 28px;
+    height: 28px;
+  }
+  .offline-hint-title {
+    font-size: 11px;
+  }
+  .offline-hint-desc {
+    font-size: 10px;
+  }
+  .offline-branding {
+    margin-top: 8px;
+  }
+}
+
+/* ── Mobile viewport (width <= 640px) ── */
 @media (max-width: 640px) {
   .offline-icon-wrapper {
-    width: 110px;
-    height: 110px;
+    width: 105px;
+    height: 105px;
   }
 
   .offline-wifi-icon {
-    width: 68px;
-    height: 68px;
+    width: 66px;
+    height: 66px;
   }
 
   .offline-content {
-    gap: 18px;
+    gap: 16px;
   }
 
   .offline-description {
-    font-size: 14px;
-  }
-
-  .offline-retry-btn {
-    padding: 11px 26px;
     font-size: 13px;
   }
 
-  .offline-branding {
-    bottom: 20px;
+  .offline-retry-btn {
+    padding: 10px 24px;
+    font-size: 13px;
   }
 
   .offline-bg-orb--cyan,
   .offline-bg-orb--violet {
-    width: 280px;
-    height: 280px;
+    width: 260px;
+    height: 260px;
   }
 
   .offline-bg-orb--rose {
-    width: 180px;
-    height: 180px;
+    width: 160px;
+    height: 160px;
   }
 }
